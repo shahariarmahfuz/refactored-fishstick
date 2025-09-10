@@ -1,0 +1,17 @@
+{% extends 'layout.html' %}
+{% block content %}
+<h1>পেমেন্ট নম্বর সেটিংস</h1>
+<div style="background: #f9f9f9; padding: 20px; border-radius: 8px;">
+    <form method="post">
+        <div style="margin-bottom: 15px;">
+            <label for="bKash_number" style="font-weight: bold;">বিকাশ নম্বর:</label>
+            <input type="text" name="bKash_number" value="{{ settings.get('bKash', '') }}" placeholder="01xxxxxxxxx">
+        </div>
+        <div style="margin-bottom: 15px;">
+            <label for="Nagad_number" style="font-weight: bold;">নগদ নম্বর:</label>
+            <input type="text" name="Nagad_number" value="{{ settings.get('Nagad', '') }}" placeholder="01xxxxxxxxx">
+        </div>
+        <input type="submit" value="সেভ করুন">
+    </form>
+</div>
+{% endblock %}

@@ -1,0 +1,81 @@
+{% extends 'user_layout.html' %}
+{% block content %}
+<style>
+    .checkout-container {
+        max-width: 600px;
+        margin: auto;
+        text-align: center;
+        padding: 20px;
+    }
+    .payment-options {
+        display: grid;
+        grid-template-columns: 1fr 1fr; /* দুটি কলাম তৈরি করবে */
+        gap: 20px; /* দুটি আইটেমের মধ্যে ফাঁকা জায়গা */
+        margin-top: 30px;
+    }
+    /* ছবিসহ পেমেন্ট অপশনের জন্য স্টাইল */
+    .payment-option-img {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 15px;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        transition: all 0.2s ease-in-out;
+    }
+    .payment-option-img img {
+        width: 70%; /* কন্টেইনারের ৭০% জায়গা নিবে */
+        height: auto;
+        display: block;
+    }
+    .payment-option-img:hover {
+        border-color: #4CAF50;
+        transform: translateY(-5px);
+        box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+
+    /* শুধুমাত্র টেক্সটসহ পেমেন্ট অপশনের জন্য স্টাইল */
+    .payment-option {
+        display: block;
+        padding: 20px;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        text-decoration: none;
+        color: #333;
+        font-weight: bold;
+        font-size: 1.2em;
+        transition: all 0.2s ease-in-out;
+    }
+    .payment-option:hover {
+        border-color: #4CAF50;
+        background-color: #f9f9f9;
+        transform: translateY(-5px);
+        box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+</style>
+<div class="checkout-container">
+    <h1>পেমেন্ট মেথড সিলেক্ট করুন</h1>
+    <p><strong>পরিমাণ:</strong> {{ "%.2f"|format(amount) }} টাকা</p>
+    <hr>
+    <div class="payment-options">
+        {% for method in payment_methods %}
+            {% if method.name|lower == 'bkash' %}
+                <a href="{{ url_for('user_auth.add_funds_payment_page', amount=amount, method=method.name) }}" class="payment-option-img">
+                    <img src="https://i.postimg.cc/wBwCmJQR/bkash.png" alt="bKash Payment">
+                </a>
+            {% elif method.name|lower == 'nagad' %}
+                 <a href="{{ url_for('user_auth.add_funds_payment_page', amount=amount, method=method.name) }}" class="payment-option-img">
+                    <img src="https://i.postimg.cc/3JjbGmKr/nagad.png" alt="Nagad Payment">
+                </a>
+            {% else %}
+                {# অন্য কোনো পেমেন্ট মেথড থাকলে টেক্সট হিসেবে দেখাবে #}
+                <a href="{{ url_for('user_auth.add_funds_payment_page', amount=amount, method=method.name) }}" class="payment-option">
+                    {{ method.name }}
+                </a>
+            {% endif %}
+        {% else %}
+            <p>কোনো পেমেন্ট মেথড চালু নেই। অনুগ্রহ করে পরে আবার চেষ্টা করুন।</p>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

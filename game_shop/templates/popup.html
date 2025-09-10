@@ -1,0 +1,46 @@
+{% extends 'layout.html' %}
+{% block content %}
+<style>
+    .popup-form { background: #f9f9f9; padding: 20px; border-radius: 8px; }
+    .form-group { margin-bottom: 15px; }
+    .form-group label { display: block; margin-bottom: 5px; font-weight: bold; }
+    .status-active { color: green; font-weight: bold; }
+    .status-inactive { color: grey; }
+</style>
+
+<h1>পপ-আপ মেসেজ ম্যানেজমেন্ট</h1>
+<div class="popup-form">
+    <form action="{{ url_for('admin.save_popup') }}" method="post">
+        <input type="hidden" name="title" value=""> <div class="form-group">
+            <label for="content">কনটেন্ট (আবশ্যক):</label>
+            <textarea name="content" style="min-height: 80px;" required>{{ message.content if message else '' }}</textarea>
+        </div>
+        <div class="form-group">
+            <label for="image_url">ছবির URL (ঐচ্ছিক, 16:9):</label>
+            <input type="url" name="image_url" value="{{ message.image_url if message else '' }}">
+        </div>
+        <div class="form-group">
+            <label for="button_text">বাটনের টেক্সট (ঐচ্ছিক):</label>
+            <input type="text" name="button_text" value="{{ message.button_text if message else '' }}">
+        </div>
+        <div class="form-group">
+            <label for="button_url">বাটনের লিঙ্ক (ঐচ্ছিক):</label>
+            <input type="url" name="button_url" value="{{ message.button_url if message else '' }}">
+        </div>
+        <input type="submit" value="সেভ করুন">
+    </form>
+    {% if message %}
+    <div style="margin-top: 20px;">
+        <strong>বর্তমান স্ট্যাটাস:</strong>
+        {% if message.is_active == 1 %} <span class="status-active">Enable</span>
+        {% else %} <span class="status-inactive">Disable</span>
+        {% endif %}
+        <form action="{{ url_for('admin.toggle_popup') }}" method="post" style="display:inline; margin-left: 20px;">
+            <button type="submit">
+                {% if message.is_active == 1 %} Disable করুন {% else %} Enable করুন {% endif %}
+            </button>
+        </form>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

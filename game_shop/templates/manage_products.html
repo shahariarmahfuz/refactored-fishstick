@@ -1,0 +1,51 @@
+{% extends 'admin_layout.html' %}
+{% block content %}
+<style>
+    .category-list {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 20px;
+    }
+    .category-item {
+        display: block;
+        background: #fff;
+        padding: 20px;
+        border-radius: 8px;
+        text-decoration: none;
+        color: #333;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .category-item:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    .category-item h3 {
+        margin: 0 0 5px 0;
+    }
+    .category-item .game-title {
+        font-size: 0.9em;
+        color: #6c757d;
+        margin-bottom: 10px;
+    }
+    .category-item .product-count {
+        font-size: 0.9em;
+        color: #007bff;
+        font-weight: bold;
+    }
+</style>
+<h1>Manage Products by Category</h1>
+<p>যেকোনো একটি ক্যাটাগরি সিলেক্ট করে তার প্রোডাক্টগুলো দেখুন অথবা নতুন প্রোডাক্ট যোগ করুন।</p>
+
+<div class="category-list">
+    {% for category in categories %}
+    <a href="{{ url_for('admin.view_products_by_category', category_id=category.id) }}" class="category-item">
+        <h3>{{ category.name }}</h3>
+        <p class="game-title">{{ category.game_title }}</p>
+        <p class="product-count">{{ category.product_count }} Products</p>
+    </a>
+    {% else %}
+    <p>কোনো ক্যাটাগরি পাওয়া যায়নি। অনুগ্রহ করে প্রথমে একটি ক্যাটাগরি যোগ করুন।</p>
+    {% endfor %}
+</div>
+{% endblock %}

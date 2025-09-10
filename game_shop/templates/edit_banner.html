@@ -1,0 +1,20 @@
+{% extends 'layout.html' %}
+{% block content %}
+<h1>Edit Banner</h1>
+<div class="form-section">
+    <form method="post">
+        <div style="margin-bottom: 15px;">
+            <label>Current Image:</label><br>
+            <img src="{{ banner.image_url }}" alt="Banner Preview" style="max-width: 320px; border-radius: 8px;">
+        </div>
+        <label for="image_url">New Image URL (1280x500px):</label>
+        <input type="url" name="image_url" value="{{ banner.image_url }}" required>
+        
+        <label for="target_url">Link (Optional):</label>
+        <input type="url" name="target_url" value="{{ banner.target_url or '' }}">
+        
+        <input type="submit" value="Update Banner">
+        <a href="{{ url_for('admin.banners') }}" class="button btn-secondary">Cancel</a>
+    </form>
+</div>
+{% endblock %}

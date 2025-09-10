@@ -1,0 +1,182 @@
+<!doctype html>
+<html lang="bn">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>X NEKO</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;700&display=swap" rel="stylesheet">
+
+    <style>
+        /* বেগুনি থিমের জন্য ভ্যারিয়েবল */
+        :root {
+            --primary-color: #6d28d9;
+            --primary-hover: #5b21b6;
+            --primary-light: #f5f3ff;
+            --text-success: #166534;
+            --bg-success: #f0fdf4;
+            --footer-bg: #1f2937;
+            --footer-text: #d1d5db;
+        }
+
+        body { 
+            font-family: 'Quicksand', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; 
+            margin: 0; 
+            background-color: #f8fafc; 
+            color: #1f2937;
+            padding-top: 70px;
+            padding-bottom: 70px;
+        }
+
+        .layout-main { 
+            max-width: 1200px; 
+            margin: 20px auto; 
+            padding: 0;
+        }
+
+        .content-wrapper {
+            padding: 0 15px;
+        }
+
+        /* উপরের নেভিগেশন বার (গ্লাস ইফেক্ট) */
+        .top-nav { 
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            box-sizing: border-box;
+            background: rgba(255, 255, 255, 0.75);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 10px 20px; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            z-index: 1000; 
+        }
+        .nav-logo a { text-decoration: none; display: flex; align-items: center; }
+
+        /* --- CSS সিলেক্টরটি আরও সুনির্দিষ্ট করা হয়েছে --- */
+        .top-nav .nav-logo img {
+            height: 40px; /* আপনার প্রয়োজন অনুযায়ী উচ্চতা পরিবর্তন করতে পারেন */
+            width: auto;
+        }
+        /* ------------------------------------------- */
+
+        .nav-actions { display: flex; align-items: center; gap: 15px; }
+        .wallet-balance { background-color: var(--bg-success); color: var(--text-success); padding: 8px 15px; border-radius: 20px; font-weight: bold; font-size: 0.9em; display: flex; align-items: center; gap: 8px; text-decoration: none; transition: opacity 0.2s; }
+        .wallet-balance:hover { opacity: 0.9; }
+        .user-menu { position: relative; }
+        .user-icon { width: 40px; height: 40px; border-radius: 50%; background-color: var(--primary-color); color: white; display: flex; justify-content: center; align-items: center; font-size: 1.2em; font-weight: bold; cursor: pointer; text-transform: uppercase; }
+        .dropdown-content { display: none; position: absolute; right: 0; top: 50px; background-color: white; min-width: 200px; box-shadow: 0 8px 24px rgba(0,0,0,0.1); z-index: 100; border-radius: 8px; overflow: hidden; border: 1px solid #eee; }
+        .dropdown-content a { font-size: 0.95em; color: black; padding: 12px 16px; text-decoration: none; display: flex; align-items: center; gap: 10px; }
+        .dropdown-content a:hover { background-color: var(--primary-light); color: var(--primary-color); }
+        .dropdown-content .fa-fw { width: 20px; }
+        .user-menu:hover .dropdown-content { display: block; }
+        .login-btn { background-color: var(--primary-color); color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; font-weight: bold; transition: background-color 0.2s; }
+        .login-btn:hover { background-color: var(--primary-hover); }
+        .flash { padding: 1em; margin: 1em 15px; border-radius: 4px; background: #d9edf7; color: #31708f; border: 1px solid #bce8f1; }
+
+        /* ফুটার এবং নিচের নেভিগেশন অপরিবর্তিত */
+        .site-footer { background-color: var(--footer-bg); color: var(--footer-text); padding: 60px 0 20px; margin-top: 40px; font-size: 0.95em; line-height: 1.7; }
+        .footer-container { max-width: 1200px; margin: 0 auto; padding: 0 20px; display: flex; flex-wrap: wrap; justify-content: space-between; gap: 30px; }
+        .footer-column { flex: 1; min-width: 250px; padding: 0 15px; }
+        .footer-column h3 { font-size: 1.2em; color: #ffffff; margin-bottom: 20px; position: relative; padding-bottom: 10px; }
+        .footer-column h3::after { content: ''; position: absolute; left: 0; bottom: 0; width: 40px; height: 2px; background-color: var(--primary-color); }
+        .footer-links ul { list-style: none; padding: 0; margin: 0; }
+        .footer-links li { margin-bottom: 10px; }
+        .footer-links a { color: var(--footer-text); text-decoration: none; transition: all 0.3s ease; }
+        .footer-links a:hover { color: #ffffff; padding-left: 5px; }
+        .footer-contact p { margin: 10px 0; }
+        .footer-contact .fa-fw { margin-right: 8px; color: var(--primary-color); }
+        .footer-social-links { margin-top: 20px; }
+        .footer-social-links a { display: inline-flex; justify-content: center; align-items: center; width: 40px; height: 40px; border-radius: 50%; background-color: #374151; color: #ffffff; text-decoration: none; margin-right: 10px; transition: background-color 0.3s ease; }
+        .footer-social-links a:hover { background-color: var(--primary-color); }
+        .footer-bottom { text-align: center; margin-top: 40px; padding-top: 20px; border-top: 1px solid #374151; }
+
+        .bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; background: rgba(255, 255, 255, 0.75); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border-top: 1px solid rgba(255, 255, 255, 0.2); display: flex; justify-content: space-around; z-index: 1000; }
+        .bottom-nav a { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 10px 5px; text-decoration: none; color: #6b7280; flex-grow: 1; font-size: 0.75em; }
+        .bottom-nav a .fas { font-size: 1.4em; margin-bottom: 4px; }
+        .bottom-nav a.active { color: var(--primary-color); }
+    </style>
+</head>
+<body>
+    <header class="top-nav">
+        <div class="nav-logo">
+            <a href="{{ url_for('views.home') }}">
+                <img src="https://i.postimg.cc/v84V8xsD/IMG-20250910-092824.png" alt="X NEKO Logo">
+            </a>
+        </div>
+        <div class="nav-actions">
+            {% if g.user %}
+                <a href="{{ url_for('user_auth.wallet') }}" class="wallet-balance">
+                    <i class="fas fa-wallet fa-fw"></i> {{ "%.2f"|format(g.user.balance) }} ৳
+                </a>
+                <div class="user-menu">
+                    <div class="user-icon">{{ g.user.username[0]|upper }}</div>
+                    <div class="dropdown-content">
+                        <a href="{{ url_for('user_auth.my_account') }}"><i class="fas fa-user-circle fa-fw"></i> My Account</a>
+                        <a href="{{ url_for('user_auth.wallet') }}"><i class="fas fa-wallet fa-fw"></i> My Wallet</a>
+                        {% if g.admin %}
+                            <hr style="margin: 0; border-color: #eee;"><a href="{{ url_for('admin.dashboard') }}" style="color: #007bff;"><i class="fas fa-cogs fa-fw"></i> Admin Panel</a>
+                        {% endif %}
+                        <hr style="margin: 0; border-color: #eee;"><a href="{{ url_for('user_auth.logout') }}"><i class="fas fa-sign-out-alt fa-fw"></i> Logout</a>
+                    </div>
+                </div>
+            {% else %}
+                <a href="{{ url_for('user_auth.login') }}" class="login-btn">Login / Register</a>
+            {% endif %}
+        </div>
+    </header>
+
+    <main class="layout-main">
+        {% with messages = get_flashed_messages(with_categories=true) %}{% if messages %}{% for category, message in messages %}<div class="flash">{{ message }}</div>{% endfor %}{% endif %}{% endwith %}
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer class="site-footer">
+        <div class="footer-container">
+            <div class="footer-column footer-about">
+                <h3>X NEKO</h3>
+                <p>আপনার বিশ্বস্ত গেমিং টপ-আপ এবং ডিজিটাল প্রোডাক্টের নির্ভরযোগ্য একটি প্ল্যাটফর্ম। দ্রুত ডেলিভারি ও নিরাপদ পেমেন্টের নিশ্চয়তা।</p>
+            </div>
+            <div class="footer-column footer-links">
+                <h3>নীতিমালা ও সহায়তা</h3>
+                <ul>
+                    <li><a href="#">কিভাবে অর্ডার করবেন?</a></li>
+                    <li><a href="#">গোপনীয়তা নীতি (Privacy Policy)</a></li>
+                    <li><a href="#">শর্তাবলী (Terms of Service)</a></li>
+                    <li><a href="#">ফেরত নীতি (Refund Policy)</a></li>
+                </ul>
+            </div>
+            <div class="footer-column footer-contact">
+                <h3>যোগাযোগ</h3>
+                <p><i class="fas fa-envelope fa-fw"></i> contact@xneko.com</p> <p><i class="fas fa-phone fa-fw"></i> +880 1234 567890</p>
+                <div class="footer-social-links">
+                    <a href="#" target="_blank"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#" target="_blank"><i class="fab fa-youtube"></i></a>
+                    <a href="#" target="_blank"><i class="fab fa-whatsapp"></i></a>
+                    <a href="#" target="_blank"><i class="fab fa-telegram-plane"></i></a>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2025 X NEKO. All rights reserved.</p>
+        </div>
+    </footer>
+
+    {% if g.user %}
+    <nav class="bottom-nav">
+        <a href="{{ url_for('views.home') }}" class="{% if request.endpoint == 'views.home' %}active{% endif %}"><i class="fas fa-home"></i><span>Home</span></a>
+        <a href="{{ url_for('user_auth.add_funds') }}" class="{% if 'add_funds' in request.endpoint %}active{% endif %}"><i class="fas fa-plus-circle"></i><span>Add Money</span></a>
+        <a href="{{ url_for('views.my_orders') }}" class="{% if request.endpoint == 'views.my_orders' %}active{% endif %}"><i class="fas fa-box"></i><span>My Orders</span></a>
+        <a href="{{ url_for('user_auth.my_account') }}" class="{% if request.endpoint == 'user_auth.my_account' %}active{% endif %}"><i class="fas fa-user"></i><span>My Account</span></a>
+        <a href="{{ url_for('user_auth.redeem') }}" class="{% if request.endpoint == 'user_auth.redeem' %}active{% endif %}"><i class="fas fa-gift"></i><span>Redeem</span></a>
+    </nav>
+    {% endif %}
+</body>
+</html>

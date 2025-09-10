@@ -1,0 +1,54 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+<style>
+    .wallet-management-table th, .wallet-management-table td {
+        vertical-align: middle;
+    }
+    .update-form {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    .update-form input[type="number"] {
+        width: 100px;
+        margin-bottom: 0;
+    }
+    .update-form input[type="submit"] {
+        margin-top: 0;
+    }
+</style>
+
+<h1>ইউজার ওয়ালেট ম্যানেজমেন্ট</h1>
+<p>এখান থেকে আপনি যেকোনো ইউজারের ওয়ালেট ব্যালেন্স সরাসরি পরিবর্তন করতে পারবেন।</p>
+
+<table class="wallet-management-table">
+    <thead>
+        <tr>
+            <th>ইউজারনেম</th>
+            <th>বর্তমান ব্যালেন্স</th>
+            <th>ব্যালেন্স আপডেট করুন</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for user in users %}
+        <tr>
+            <td><strong>{{ user.username }}</strong></td>
+            <td>{{ "%.2f"|format(user.balance) }} টাকা</td>
+            <td>
+                <form method="post" class="update-form">
+                    <input type="hidden" name="user_id" value="{{ user.id }}">
+                    <input type="number" name="balance" step="0.01" placeholder="নতুন ব্যালেন্স" required>
+                    <input type="submit" value="আপডেট">
+                </form>
+            </td>
+        </tr>
+        {% else %}
+        <tr>
+            <td colspan="3" style="text-align: center;">কোনো ইউজার রেজিস্ট্রেশন করেনি।</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+{% endblock %}

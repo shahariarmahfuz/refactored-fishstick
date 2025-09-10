@@ -1,0 +1,22 @@
+{% extends 'admin_layout.html' %}
+{% block content %}
+    <h1>Edit Category</h1>
+    <div class="form-section">
+        <form method="post">
+            <label for="game_id">Select Game:</label>
+            <select name="game_id" required>
+                {% for game in games %}
+                <option value="{{ game.id }}" {% if game.id == category.game_id %}selected{% endif %}>{{ game.title }}</option>
+                {% endfor %}
+            </select>
+            <label for="name">Category Name:</label>
+            <input type="text" name="name" value="{{ category.name }}" required>
+            <label for="image_url">Image URL:</label>
+            <input type="url" name="image_url" value="{{ category.image_url }}" required>
+            <label for="rules_text">ব্যবহারবিধি (ঐচ্ছিক):</label>
+            <textarea name="rules_text" rows="4">{{ category.rules_text or '' }}</textarea>
+            <input type="submit" value="Update Category">
+            <a href="{{ url_for('admin.manage_categories') }}" class="button btn-secondary">Cancel</a>
+        </form>
+    </div>
+{% endblock %}

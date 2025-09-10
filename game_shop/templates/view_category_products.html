@@ -1,0 +1,87 @@
+{% extends 'admin_layout.html' %}
+{% block content %}
+    <h1>Products in: {{ category.name }}</h1>
+    <a href="{{ url_for('admin.manage_products') }}" class="button btn-secondary" style="margin-bottom: 20px;">&larr; Back to Categories</a>
+
+    <div class="form-section">
+        <h2>Add New Product to this Category</h2>
+        <form method="post" action="{{ url_for('admin.view_products_by_category', category_id=category.id) }}">
+            <label for="name">Product Name:</label>
+            <input type="text" name="name" required>
+            <label for="price">Price:</label>
+            <input type="number" name="price" step="0.01" required>
+
+            <div style="margin-top: 10px; margin-bottom: 10px;">
+                <label>
+                    <input type="checkbox" name="is_limited" onchange="toggleStock(this)">
+                    Limit Stock (for special offers)
+                </label>
+            </div>
+            <div id="stock-field" style="display: none;">
+                <label for="stock">Available Stock:</label>
+                <input type="number" name="stock" min="0">
+            </div>
+            <div>
+                <label for="restriction_days">UID Restriction (in days, 0 for none):</label>
+                <input type="number" name="restriction_days" min="0" value="0">
+            </div>
+
+            <input type="submit" value="Add Product">
+        </form>
+    </div>
+
+    <h2>Existing Products in this Category</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Product Name</th>
+                <th>Price</th>
+                <th>Stock</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for product in products %}
+            <tr>
+                <td>{{ product.name }}</td>
+                <td>{{ "%.2f"|format(product.price) }}</td>
+                <td>
+                    {% if product.is_limited %}
+                        <span style="font-weight: bold; color: {% if product.stock <= 0 %}#dc3545{% else %}#28a745{% endif %};">
+                            {{ product.stock }} available
+                        </span>
+                    {% else %}
+                        <span style="color: #6c757d;">Unlimited</span>
+                    {% endif %}
+                </td>
+                <td>
+                    {% if product.is_active %}
+                        <span style="color: #28a745;">Active</span>
+                    {% else %}
+                        <span style="color: #6c757d;">Inactive</span>
+                    {% endif %}
+                </td>
+                <td class="actions">
+                    <a href="{{ url_for('admin.edit_product', product_id=product.id) }}" class="button btn-secondary">Edit</a>
+                    <form action="{{ url_for('admin.toggle_product_status', product_id=product.id) }}" method="post" style="display: inline-block;">
+                        {% if product.is_active %}
+                            <input type="submit" value="Disable" class="btn-danger">
+                        {% else %}
+                            <input type="submit" value="Enable" class="button">
+                        {% endif %}
+                    </form>
+                </td>
+            </tr>
+            {% else %}
+            <tr><td colspan="5" style="text-align: center;">No products found in this category.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+<script>
+function toggleStock(checkbox) {
+    document.getElementById('stock-field').style.display = checkbox.checked ? 'block' : 'none';
+}
+</script>
+{% endblock %}

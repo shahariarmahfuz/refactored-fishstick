@@ -1,0 +1,106 @@
+{% extends 'admin_layout.html' %}
+{% block content %}
+<style>
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 20px;
+        margin-bottom: 30px;
+    }
+    .stat-card {
+        background: #fff;
+        padding: 25px;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        display: flex;
+        align-items: center;
+        gap: 20px;
+    }
+    .stat-card .icon {
+        font-size: 2.5em;
+        padding: 15px;
+        border-radius: 50%;
+        color: #fff;
+    }
+    .stat-card .info .value {
+        font-size: 1.8em;
+        font-weight: bold;
+        color: #333;
+    }
+    .stat-card .info .label {
+        font-size: 1em;
+        color: #777;
+    }
+    .icon-users { background-color: #007bff; }
+    .icon-revenue { background-color: #28a745; }
+    .icon-weekly { background-color: #ffc107; }
+    .icon-orders { background-color: #17a2b8; }
+
+    .recent-orders h2 {
+        border-bottom: 2px solid #eee;
+        padding-bottom: 10px;
+    }
+</style>
+
+<h1>ড্যাশবোর্ড</h1>
+
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="icon icon-revenue"><i class="fas fa-dollar-sign"></i></div>
+        <div class="info">
+            <div class="value">{{ "%.2f"|format(stats.total_revenue) }} ৳</div>
+            <div class="label">Total Revenue</div>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="icon icon-weekly"><i class="fas fa-calendar-week"></i></div>
+        <div class="info">
+            <div class="value">{{ "%.2f"|format(stats.weekly_revenue) }} ৳</div>
+            <div class="label">Weekly Revenue</div>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="icon icon-users"><i class="fas fa-users"></i></div>
+        <div class="info">
+            <div class="value">{{ stats.total_users }}</div>
+            <div class="label">Total Users</div>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="icon icon-orders"><i class="fas fa-shopping-cart"></i></div>
+        <div class="info">
+            <div class="value">{{ stats.daily_orders }}</div>
+            <div class="label">Orders (Last 24h)</div>
+        </div>
+    </div>
+</div>
+
+<div class="recent-orders">
+    <h2>Recent Orders</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Order ID</th>
+                <th>User</th>
+                <th>Package</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for order in recent_orders %}
+            <tr>
+                <td>#{{ order.id }}</td>
+                <td>{{ order.username }}</td>
+                <td>{{ order.product_name }}</td>
+                <td>{{ order.status }}</td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="4" style="text-align: center;">No recent orders.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+{% endblock %}

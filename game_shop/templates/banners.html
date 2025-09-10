@@ -1,0 +1,64 @@
+{% extends 'layout.html' %}
+{% block content %}
+<style>
+    .banner-form { background: #f9f9f9; padding: 20px; border-radius: 8px; margin-bottom: 30px; }
+    .banner-list img { max-width: 200px; border-radius: 5px; vertical-align: middle; }
+    .banner-list td { padding: 10px; vertical-align: middle; }
+    .status-active { color: green; font-weight: bold; }
+    .status-inactive { color: grey; }
+</style>
+
+<h1>ব্যানার ম্যানেজমেন্ট</h1>
+
+<div class="banner-form">
+    <h2>নতুন ব্যানার যোগ করুন</h2>
+    <form action="{{ url_for('admin.add_banner') }}" method="post">
+        <label for="image_url">ছবির URL (Size: 1280x500px):</label>
+        <input type="url" name="image_url" placeholder="https://example.com/image.jpg" required>
+        <label for="target_url">লিঙ্ক (ঐচ্ছিক):</label>
+        <input type="url" name="target_url" placeholder="https://example.com/link">
+        <input type="submit" value="ব্যানার যোগ করুন">
+    </form>
+</div>
+
+<h2>বিদ্যমান ব্যানারসমূহ</h2>
+<table>
+    <thead>
+        <tr>
+            <th>ছবি</th>
+            <th>স্ট্যাটাস</th>
+            <th>অ্যাকশন</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for banner in banners %}
+        <tr>
+            <td><img src="{{ banner.image_url }}" alt="Banner Image"></td>
+            <td>
+                {% if banner.is_active == 1 %}
+                    <span class="status-active">Enable</span>
+                {% else %}
+                    <span class="status-inactive">Disable</span>
+                {% endif %}
+            </td>
+            <td class="actions">
+                <a href="{{ url_for('admin.edit_banner', banner_id=banner.id) }}" class="button btn-secondary">Edit</a>
+                <form action="{{ url_for('admin.toggle_banner', banner_id=banner.id) }}" method="post">
+                    <button type="submit">
+                        {% if banner.is_active == 1 %} Disable {% else %} Enable {% endif %}
+                    </button>
+                </form>
+                <form action="{{ url_for('admin.delete_banner', banner_id=banner.id) }}" method="post">
+                    <button type="submit" class="btn-danger" onclick="return confirm('আপনি কি নিশ্চিত?')">Delete</button>
+                </form>
+            </td>
+        </tr>
+        {% else %}
+        <tr>
+            <td colspan="3">কোনো ব্যানার যোগ করা হয়নি।</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+{% endblock %}

@@ -1,0 +1,185 @@
+{% extends 'user_layout.html' %}
+
+{% block content %}
+<style>
+    /* Modern styles for the new wallet page */
+    .wallet-page-container {
+        padding: 0 15px; /* Padding for mobile screens */
+        max-width: 800px;
+        margin: 0 auto;
+    }
+
+    /* Card for displaying the balance */
+    .balance-card {
+        background: linear-gradient(135deg, var(--primary-color), #8b5cf6);
+        color: white;
+        padding: 25px 20px;
+        border-radius: 12px;
+        text-align: center;
+        margin-bottom: 30px;
+        box-shadow: 0 10px 20px rgba(109, 40, 217, 0.2);
+    }
+    .balance-card h1 {
+        margin: 0 0 5px 0;
+        font-size: 1em;
+        font-weight: normal;
+        opacity: 0.9;
+    }
+    .balance-amount {
+        font-size: 2.5em;
+        font-weight: 700;
+        margin-bottom: 20px;
+    }
+    .add-funds-btn {
+        background-color: white;
+        color: var(--primary-color);
+        padding: 12px 25px;
+        text-decoration: none;
+        border-radius: 8px;
+        font-weight: bold;
+        display: inline-block;
+        transition: all 0.2s ease;
+    }
+    .add-funds-btn:hover {
+        background-color: #f5f3ff;
+        transform: translateY(-2px);
+    }
+
+    /* Style for filter tabs */
+    .filter-tabs {
+        display: flex;
+        gap: 10px;
+        border-bottom: 1px solid #e5e7eb;
+        margin-bottom: 25px;
+    }
+    .tab-link {
+        padding: 10px 15px;
+        text-decoration: none;
+        color: #6b7280;
+        font-weight: bold;
+        font-size: 0.95em;
+        border-bottom: 3px solid transparent;
+        transition: all 0.2s ease-in-out;
+    }
+    .tab-link.active {
+        color: var(--primary-color);
+        border-bottom-color: var(--primary-color);
+    }
+
+    .section-title {
+        font-size: 1.4em;
+        color: #1f2937;
+        margin-bottom: 15px;
+    }
+
+    /* Card style for the transaction list */
+    .transaction-list {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+    .transaction-card {
+        background-color: #ffffff;
+        border: 1px solid #e5e7eb;
+        border-radius: 10px;
+        padding: 15px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        transition: box-shadow 0.2s;
+    }
+    .transaction-card:hover {
+        box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    }
+
+    .tx-info {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    }
+    .tx-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.2em;
+    }
+    .tx-icon.approved { background-color: #e0fbe2; color: #16a34a; }
+    .tx-icon.pending { background-color: #fef9c3; color: #f59e0b; }
+
+    .tx-amount {
+        font-size: 1.1em;
+        font-weight: bold;
+        color: #111827;
+    }
+    .tx-time {
+        font-size: 0.8em;
+        color: #6b7280;
+    }
+
+    .tx-status {
+        font-size: 0.85em;
+        font-weight: bold;
+        padding: 4px 10px;
+        border-radius: 20px;
+        text-align: center;
+    }
+    .tx-status-approved { background-color: #dcfce7; color: #166534; }
+    .tx-status-pending { background-color: #fef3c7; color: #92400e; }
+
+    /* Message for when there are no transactions */
+    .no-transactions {
+        text-align: center;
+        padding: 40px 20px;
+        background-color: #f9fafb;
+        border-radius: 8px;
+        color: #6b7280;
+    }
+
+</style>
+
+<div class="wallet-page-container">
+    <div class="balance-card">
+        <h1>Your Current Balance</h1>
+        <div class="balance-amount">{{ "%.2f"|format(user.balance) }} ৳</div>
+        <a href="{{ url_for('user_auth.add_funds') }}" class="add-funds-btn">
+            <i class="fas fa-plus-circle"></i> Add Funds
+        </a>
+    </div>
+
+    <div class="filter-tabs">
+        <a href="{{ url_for('user_auth.wallet', filter='all') }}" class="tab-link {% if filter == 'all' %}active{% endif %}">All</a>
+        <a href="{{ url_for('user_auth.wallet', filter='Pending') }}" class="tab-link {% if filter == 'Pending' %}active{% endif %}">Pending</a>
+        <a href="{{ url_for('user_auth.wallet', filter='Approved') }}" class="tab-link {% if filter == 'Approved' %}active{% endif %}">Completed</a>
+    </div>
+
+    <h2 class="section-title">Transaction History</h2>
+
+    <div class="transaction-list">
+        {% for tx in transactions %}
+        <div class="transaction-card">
+            <div class="tx-info">
+                {% if tx.status == 'Approved' %}
+                    <div class="tx-icon approved"><i class="fas fa-check"></i></div>
+                {% elif tx.status == 'Pending' %}
+                    <div class="tx-icon pending"><i class="fas fa-hourglass-half"></i></div>
+                {% endif %}
+                <div>
+                    <div class="tx-amount">{{ "%.2f"|format(tx.amount) }} ৳</div>
+                    <div class="tx-time">{{ tx.request_time.strftime('%d %b %Y, %I:%M %p') }}</div>
+                </div>
+            </div>
+            <div class="tx-status tx-status-{{ tx.status.lower() }}">
+                {{ tx.status }}
+            </div>
+        </div>
+        {% else %}
+        <div class="no-transactions">
+            <p>No transactions found for this filter.</p>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

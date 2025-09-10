@@ -1,0 +1,64 @@
+{% extends 'user_layout.html' %}
+{% block content %}
+<style>
+    .checkout-container {
+        max-width: 600px;
+        margin: auto;
+        text-align: center;
+        padding: 20px;
+    }
+    .payment-options {
+        display: grid;
+        grid-template-columns: 1fr 1fr; /* দুটি কলাম রি করবে */
+        gap: 20px; /* দুটি ছবির মধ্যে ফাঁকা জায়গা */
+        margin-top: 30px;
+    }
+    .payment-option-img {
+        /* পরিবর্তন: ছবিকে মাঝখানে আনার জন্য Flexbox ব্যবহার করা হয়েছে */
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 15px; /* ছবির চারপাশে কিছুটা জায়গা তৈরি করবে */
+
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        transition: all 0.2s ease-in-out;
+    }
+    .payment-option-img img {
+        /* পরিবর্তন: ছবির প্রস্থ কমানো হয়েছে */
+        width: 70%; /* কন্টেইনারের ৭০% জায়গা নিবে */
+        height: auto; /* উচ্চতা অনুপাত অনুযায়ী ঠিক হবে */
+        display: block;
+    }
+    .payment-option-img:hover {
+        border-color: #4CAF50;
+        transform: translateY(-5px);
+        box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+</style>
+<div class="checkout-container">
+    <h1>পেমেন্ট মেথড সিলেক্ট করুন</h1>
+    <p><strong>প্রোডাক্ট:</strong> {{ order.product_name }}</p>
+    <p><strong>মূল্য:</strong> {{ order.price }} টাকা</p>
+    <hr>
+    <div class="payment-options">
+        {# এখানে আমরা পেমেন্ট মেথডের নাম অনুযায়ী ছবি দেখাবো #}
+        {% for method in payment_methods %}
+            {% if method.name|lower == 'bkash' %}
+                <a href="{{ url_for('views.payment_page', order_id=order.id, method=method.name) }}" class="payment-option-img">
+                    <img src="https://i.postimg.cc/wBwCmJQR/bkash.png" alt="bKash Payment">
+                </a>
+            {% elif method.name|lower == 'nagad' %}
+                 <a href="{{ url_for('views.payment_page', order_id=order.id, method=method.name) }}" class="payment-option-img">
+                    <img src="https://i.postimg.cc/3JjbGmKr/nagad.png" alt="Nagad Payment">
+                </a>
+            {% else %}
+                {# অন্য কোনো পেমেন্ট মেথড থাকলে টেক্সট হিসেবে দেখাবে #}
+                <a href="{{ url_for('views.payment_page', order_id=order.id, method=method.name) }}" class="payment-option">
+                    {{ method.name }}
+                </a>
+            {% endif %}
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

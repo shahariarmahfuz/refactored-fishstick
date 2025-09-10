@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="bn">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Admin Panel</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; margin: 0; background-color: #f8f9fa; }
+        .admin-wrapper { display: flex; }
+        .sidebar { width: 250px; background: #343a40; color: white; min-height: 100vh; }
+        .sidebar-header { padding: 20px; text-align: center; background: #23272b; }
+        .sidebar-header h3 { margin: 0; }
+        .sidebar a { color: #adb5bd; text-decoration: none; display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; font-size: 0.95em; }
+        .sidebar a:hover, .sidebar a.active { background: #495057; color: white; }
+        .sidebar a .fa-fw { margin-right: 10px; }
+        .content { flex-grow: 1; padding: 30px; }
+        .flash { padding: 1em; margin-bottom: 1em; border-radius: 4px; background: #d9edf7; color: #31708f; border: 1px solid #bce8f1; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; background: #fff; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #ddd; }
+        th { background-color: #f8f9fa; }
+        .form-section { background: #fff; padding: 20px; border-radius: 8px; margin-bottom: 30px; border: 1px solid #eee;}
+        input[type=text], input[type=number], input[type=password], input[type=url], select, textarea { width: 100%; padding: 8px; margin-bottom: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
+        input[type=submit], button, .button { display: inline-block; background-color: #007bff; color: white; padding: 10px 15px; border: none; cursor: pointer; border-radius: 4px; text-decoration: none; font-size: 0.9em; }
+        .btn-danger { background-color: #dc3545; }
+        .btn-secondary { background-color: #6c757d; }
+
+        /* নতুন ব্যাজের জন্য CSS */
+        .badge {
+            background-color: #dc3545;
+            color: white;
+            padding: 2px 8px;
+            font-size: 0.8em;
+            border-radius: 10px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-wrapper">
+        <nav class="sidebar">
+            <div class="sidebar-header"><h3>Admin Panel</h3></div>
+            <a href="{{ url_for('views.home') }}"><i class="fas fa-home fa-fw"></i> Go to Site</a><hr style="margin: 0; border-color: #495057;">
+            <a href="{{ url_for('admin.dashboard') }}">
+                <span><i class="fas fa-tachometer-alt fa-fw"></i> ড্যাশবোর্ড</span>
+            </a>
+            <a href="{{ url_for('admin.view_orders') }}">
+                <span><i class="fas fa-box fa-fw"></i> অর্ডার দেখুন</span>
+                {% if g.pending_orders_count > 0 %}
+                    <span class="badge">{{ g.pending_orders_count }}</span>
+                {% endif %}
+            </a>
+            <a href="{{ url_for('admin.wallet_deposits') }}">
+                <span><i class="fas fa-piggy-bank fa-fw"></i> Wallet Deposits</span>
+                {% if g.pending_deposits_count > 0 %}
+                    <span class="badge">{{ g.pending_deposits_count }}</span>
+                {% endif %}
+            </a>
+            <a href="{{ url_for('admin.manage_codes') }}"><span><i class="fas fa-ticket-alt fa-fw"></i> Redeem Codes</span></a>
+            <hr style="margin: 0; border-color: #495057;">
+            <a href="{{ url_for('admin.manage_games') }}"><span><i class="fas fa-gamepad fa-fw"></i> Manage Games</span></a>
+            <a href="{{ url_for('admin.manage_categories') }}"><span><i class="fas fa-sitemap fa-fw"></i> Manage Categories</span></a>
+            <a href="{{ url_for('admin.manage_products') }}"><span><i class="fas fa-tags fa-fw"></i> Manage Products</span></a>
+            <hr style="margin: 0; border-color: #495057;">
+            <a href="{{ url_for('admin.banners') }}"><span><i class="fas fa-images fa-fw"></i> ব্যানার</span></a>
+            <a href="{{ url_for('admin.notices') }}"><span><i class="fas fa-bullhorn fa-fw"></i> নোটিস</span></a>
+            <a href="{{ url_for('admin.popup') }}"><span><i class="fas fa-window-maximize fa-fw"></i> পপ-আপ</span></a>
+            <hr style="margin: 0; border-color: #495057;">
+            <a href="{{ url_for('admin.manage_wallets') }}"><span><i class="fas fa-users-cog fa-fw"></i> Manage Wallets</span></a>
+            <a href="{{ url_for('admin.payment_settings') }}"><span><i class="fas fa-credit-card fa-fw"></i> পেমেন্ট সেটিংস</span></a>
+        </nav>
+        <main class="content">
+            {% with messages = get_flashed_messages(with_categories=true) %}{% if messages %}{% for category, message in messages %}<div class="flash">{{ message }}</div>{% endfor %}{% endif %}{% endwith %}
+            {% block content %}{% endblock %}
+        </main>
+    </div>
+</body>
+</html>

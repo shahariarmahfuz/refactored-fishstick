@@ -1,0 +1,158 @@
+{% extends 'user_layout.html' %}
+{% block content %}
+<style>
+    body {
+        background-color: #f4f7f6; /* A soft background color for the page */
+        font-family: 'Poppins', sans-serif; /* Modern font */
+    }
+
+    .account-container {
+        background: #ffffff;
+        padding: 30px 40px;
+        border-radius: 12px;
+        box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+        max-width: 900px;
+        margin: 40px auto;
+        border-top: 5px solid #4CAF50; /* A nice top border accent */
+    }
+
+    .account-header {
+        text-align: center;
+        margin-bottom: 35px;
+        padding-bottom: 20px;
+        border-bottom: 1px solid #eee;
+    }
+
+    .account-header h1 {
+        margin: 0;
+        font-size: 2.2em;
+        color: #333;
+    }
+
+    .account-header p {
+        font-size: 1.1em;
+        color: #777;
+        margin-top: 5px;
+    }
+
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 25px;
+        margin-bottom: 40px;
+    }
+
+    .stat-card {
+        background: #f9f9f9;
+        padding: 25px;
+        border-radius: 10px;
+        border: 1px solid #e7e7e7;
+        text-align: left;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .stat-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 6px 15px rgba(0,0,0,0.08);
+    }
+
+    .stat-card .stat-header {
+        display: flex;
+        align-items: center;
+        margin-bottom: 15px;
+    }
+
+    .stat-card .icon {
+        font-size: 1.5em;
+        margin-right: 15px;
+        color: #fff;
+        width: 45px;
+        height: 45px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    /* Unique colors for each icon */
+    .icon.weekly { background-color: #4CAF50; }
+    .icon.total-spent { background-color: #2196F3; }
+    .icon.total-orders { background-color: #FF9800; }
+
+    .stat-card .label {
+        font-size: 1.1em;
+        color: #555;
+        font-weight: 600;
+    }
+
+    .stat-card .value {
+        font-size: 2.2em;
+        font-weight: 700;
+        color: #333;
+        text-align: left;
+    }
+
+    .user-details {
+        margin-top: 30px;
+        padding-top: 25px;
+        border-top: 1px solid #eee;
+    }
+
+    .user-details h2 {
+        font-size: 1.8em;
+        margin-bottom: 20px;
+        color: #333;
+    }
+
+    .user-details p {
+        font-size: 1.1em;
+        padding: 12px;
+        border-radius: 6px;
+        background-color: #f5f5f5;
+        border: 1px solid #e9e9e9;
+        color: #555;
+    }
+
+    .user-details p strong {
+        color: #333;
+        margin-right: 10px;
+    }
+
+</style>
+
+<div class="account-container">
+    <div class="account-header">
+        <h1>My Account</h1>
+        <p>Welcome back, {{ user.username }}! Here's your activity summary.</p>
+    </div>
+
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-header">
+                <div class="icon weekly"><i class="fas fa-calendar-week"></i></div>
+                <div class="label">Weekly Spent</div>
+            </div>
+            <div class="value">{{ "%.2f"|format(stats.weekly_spent) }} ৳</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-header">
+                <div class="icon total-spent"><i class="fas fa-credit-card"></i></div>
+                <div class="label">Total Spent</div>
+            </div>
+            <div class="value">{{ "%.2f"|format(stats.total_spent) }} ৳</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-header">
+                <div class="icon total-orders"><i class="fas fa-shopping-cart"></i></div>
+                <div class="label">Total Orders</div>
+            </div>
+            <div class="value">{{ stats.total_orders }}</div>
+        </div>
+    </div>
+
+    <div class="user-details">
+        <h2>User Information</h2>
+        <p><strong>Username:</strong> {{ user.username }}</p>
+    </div>
+</div>
+{% endblock %}

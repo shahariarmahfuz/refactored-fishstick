@@ -1,0 +1,14 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+    <h1>অর্ডার করুন</h1>
+    <h2>প্রোডাক্ট: {{ category.name }}</h2>
+    <p>মূল্য: {{ category.price }} টাকা</p>
+    
+    <form method="post">
+        <label for="user_id">আপনার গেম UID দিন:</label><br>
+        <input type="text" id="user_id" name="user_id" required>
+        <br><br>
+        <input type="submit" value="অর্ডার কনফার্ম করুন">
+    </form>
+{% endblock %}

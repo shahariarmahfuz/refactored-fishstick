@@ -1,0 +1,60 @@
+{% extends 'admin_layout.html' %}
+{% block content %}
+<style>
+    .code { font-family: monospace; background: #e9ecef; padding: 2px 6px; border-radius: 4px; }
+    .status-used { color: #dc3545; }
+    .status-available { color: #28a745; }
+    .status-expired { color: #6c757d; }
+</style>
+<h1>Manage Redeem Codes</h1>
+<div class="form-section">
+    <h2>Generate New Code</h2>
+    <form method="post">
+        <label for="value">Value (Amount in Taka):</label>
+        <input type="number" name="value" step="0.01" min="1" required>
+        <label for="expiry_days">Expires in (days, optional):</label>
+        <input type="number" name="expiry_days" min="1" placeholder="e.g., 30">
+        <input type="submit" value="Generate Code">
+    </form>
+</div>
+
+<h2>Existing Codes</h2>
+<div style="overflow-x: auto;">
+    <table>
+        <thead>
+            <tr>
+                <th>Code</th>
+                <th>Value</th>
+                <th>Status</th>
+                <th>Used By</th>
+                <th>Created At</th>
+                <th>Expires At</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for code in codes %}
+            <tr>
+                <td><strong class="code">{{ code.code }}</strong></td>
+                <td>{{ "%.2f"|format(code.value) }} ৳</td>
+                <td>
+                    {% if code.is_used %}
+                        <span class="status-used">Used</span>
+                    {% elif code.expires_at and now > code.expires_at %}
+                        <span class="status-expired">Expired</span>
+                    {% else %}
+                        <span class="status-available">Available</span>
+                    {% endif %}
+                </td>
+                <td>{{ code.used_by_username or 'N/A' }}</td>
+                <td>{{ code.created_at | bst_time }}</td>
+                <td>{{ code.expires_at | bst_time if code.expires_at else 'Never' }}</td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="6" style="text-align: center;">No redeem codes found.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

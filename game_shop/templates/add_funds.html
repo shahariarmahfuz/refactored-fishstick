@@ -1,0 +1,269 @@
+{% extends 'user_layout.html' %}
+
+{% block content %}
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+Da+2:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+
+<style>
+    /* সকল স্টাইল এখন .add-funds-page-wrapper এর অধীনে রাখা হয়েছে,
+      যাতে অন্য কোনো পেজের স্টাইলের সাথে সংঘর্ষ না হয়।
+    */
+    .add-funds-page-wrapper {
+        font-family: 'Baloo Da 2', sans-serif;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        width: 100%;
+        padding: 20px 0; /* উপরে-নিচে প্যাডিং, পাশে নয় */
+        box-sizing: border-box;
+    }
+    .add-funds-page-wrapper .container {
+        background-color: #fff;
+        padding: 30px;
+        border-radius: 12px;
+        width: 90%;
+        max-width: 450px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        margin-bottom: 25px;
+        box-sizing: border-box;
+    }
+    .add-funds-page-wrapper .bottom-section-container {
+        background-color: #fff;
+        padding: 30px;
+        border-radius: 12px;
+        width: 90%;
+        max-width: 450px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        box-sizing: border-box;
+    }
+    .add-funds-page-wrapper h2 {
+        font-size: 22px;
+        font-weight: 600;
+        margin-bottom: 20px;
+        text-align: center;
+        color: #333;
+    }
+    .add-funds-page-wrapper .info-container h2, 
+    .add-funds-page-wrapper .terms-container h2 {
+        border-bottom: 1px solid #ddd;
+        padding-bottom: 15px;
+        margin-bottom: 20px;
+    }
+    .add-funds-page-wrapper .terms-container {
+        margin-top: 30px;
+    }
+    .add-funds-page-wrapper input[type="number"], 
+    .add-funds-page-wrapper input[type="text"] {
+        width: 100%;
+        padding: 12px;
+        margin-bottom: 20px;
+        border: 1px solid #e0e0e0;
+        border-radius: 8px;
+        font-size: 16px;
+        box-sizing: border-box;
+        transition: border-color 0.3s, box-shadow 0.3s;
+        font-family: 'Baloo Da 2', sans-serif;
+    }
+    .add-funds-page-wrapper input[type="number"]:focus, 
+    .add-funds-page-wrapper input[type="text"]:focus {
+        outline: none;
+        border-color: #007bff;
+        box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+    }
+    .add-funds-page-wrapper .preset-buttons {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        margin-bottom: 20px;
+    }
+    .add-funds-page-wrapper .preset-buttons button {
+        background-color: #f2f5ff;
+        color: #6c63ff;
+        border: 1px solid #e0e6f5;
+        padding: 10px 15px;
+        font-size: 14px;
+        font-weight: 500;
+        border-radius: 8px;
+        cursor: pointer;
+        margin: 6px;
+        flex: 1 1 auto;
+        max-width: 90px;
+        font-family: 'Quicksand', sans-serif;
+        transition: all 0.2s ease-in-out;
+    }
+    .add-funds-page-wrapper .preset-buttons button:hover {
+        background-color: #e5ecff;
+        border-color: #6c63ff;
+    }
+    .add-funds-page-wrapper .preset-buttons button.selected {
+        background-color: #6c63ff;
+        color: white;
+        border-color: #6c63ff;
+        box-shadow: 0 2px 6px rgba(108, 99, 255, 0.25);
+    }
+    .add-funds-page-wrapper .next-btn {
+        background-color: #007bff;
+        width: 100%;
+        padding: 14px;
+        font-size: 16px;
+        font-weight: 600;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        color: white;
+        transition: background-color 0.2s ease-in-out;
+        font-family: 'Baloo Da 2', sans-serif;
+    }
+    .add-funds-page-wrapper .next-btn:hover {
+        background-color: #0056b3;
+    }
+    .add-funds-page-wrapper ul {
+        list-style-type: none;
+        padding-left: 0;
+        margin: 0;
+        color: #555;
+    }
+    .add-funds-page-wrapper li {
+        font-size: 14px;
+        line-height: 1.6;
+        margin-bottom: 15px;
+        position: relative;
+        padding-left: 30px;
+        text-align: left;
+    }
+    .add-funds-page-wrapper li i {
+        position: absolute;
+        left: 0;
+        top: 5px;
+        color: #28a745;
+        font-size: 14px;
+    }
+    .add-funds-page-wrapper .highlight {
+        color: #007bff;
+        font-weight: 700;
+    }
+    .add-funds-page-wrapper .video-link {
+        color: #6c63ff;
+        text-decoration: none;
+        font-weight: 500;
+    }
+    .add-funds-page-wrapper .video-link:hover {
+        text-decoration: underline;
+    }
+    .add-funds-page-wrapper .error-message {
+        color: #dc3545;
+        font-size: 0.9em;
+        display: block;
+        margin-top: -15px;
+        margin-bottom: 10px;
+        text-align: left;
+    }
+</style>
+
+<div class="add-funds-page-wrapper">
+
+    <div class="container">
+        <h2>আপনার ওয়ালেটে টাকা যুক্ত করুন</h2>
+
+        <div class="preset-buttons">
+            <button type="button" onclick="setAmount(50, this)">50</button>
+            <button type="button" onclick="setAmount(100, this)">100</button>
+            <button type="button" onclick="setAmount(500, this)">500</button>
+            <button type="button" onclick="setAmount(1000, this)">1000</button>
+            <button type="button" onclick="setAmount(2000, this)">2000</button>
+        </div>
+
+        <form method="post" novalidate onsubmit="handleFormSubmit(event)">
+            {{ form.hidden_tag() }}
+            <div class="form-group">
+                {{ form.amount(id="amount", placeholder="টাকা লিখুন", type="number") }}
+                {% for error in form.amount.errors %}
+                    <span class="error-message">{{ error }}</span>
+                {% endfor %}
+            </div>
+
+            {{ form.submit(class="next-btn", value="পরবর্তী ধাপে যান") }}
+        </form>
+    </div>
+
+    <div class="bottom-section-container">
+        <div class="info-container">
+            <h2>কিভাবে টাকা যুক্ত করবেন</h2>
+            <ul>
+                <li><i class="fa-solid fa-circle-check"></i> প্রথমে নির্দিষ্ট পরিমাণ টাকা নির্বাচন করুন অথবা আপনার প্রয়োজন অনুযায়ী টাকার পরিমাণ লিখে <span class="highlight">পরবর্তী ধাপে যান</span> বাটনে ক্লিক করুন।</li>
+                <li><i class="fa-solid fa-circle-check"></i> পরবর্তী ধাপে আপনার পছন্দের পেমেন্ট পদ্ধতি (যেমন: বিকাশ, নগদ ইত্যাদি) নির্বাচন করুন।</li>
+                <li><i class="fa-solid fa-circle-check"></i> টাকা পাঠানোর পর, প্রাপ্ত <span class="highlight">ট্রানজেকশন আইডি</span> এবং সফল লেনদেনের একটি স্ক্রিনশট আপলোড করে আমাদের কাছে জমা দিন।</li>
+                <li><i class="fa-solid fa-circle-check"></i> আপনি চাইলে এই ভিডিওটি দেখতে পারেন এবং <a href="#" class="video-link">এখানে ক্লিক করুন।</a></li>
+            </ul>
+        </div>
+
+        <div class="terms-container">
+            <h2>গুরুত্বপূর্ণ বিষয়: লেনদেনের আগে অবশ্যই পড়ুন</h2>
+            <ul>
+                <li><i class="fa-solid fa-circle-check"></i> ওয়ালেটে যোগকৃত টাকা প্রত্যাহারযোগ্য নয়।</li>
+                <li><i class="fa-solid fa-circle-check"></i> টাকা যোগ করার পর সমস্ত লেনদেন চূড়ান্ত হবে।</li>
+                <li><i class="fa-solid fa-circle-check"></i> অনুগ্রহ করে প্রতিটি লেনদেনের আগে নিশ্চিত হোন।</li>
+                <li><i class="fa-solid fa-circle-check"></i> নিরাপত্তার জন্য পাসওয়ার্ড ও একাউন্ট তথ্য একাধিক ব্যবহারকারীর সাথে শেয়ার করবেন না।</li>
+            </ul>
+        </div>
+    </div>
+
+</div>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+    function setAmount(value, button) {
+        const buttons = document.querySelectorAll('.add-funds-page-wrapper .preset-buttons button');
+        buttons.forEach(btn => btn.classList.remove('selected'));
+
+        button.classList.add('selected');
+        document.getElementById('amount').value = value;
+    }
+
+    // handleFormSubmit ফাংশনটি SweetAlert2 এবং 'হ্যাঁ' বাটন ফিক্স সহ আপডেট করা হয়েছে
+    function handleFormSubmit(event) {
+        // প্রথমে ফর্ম সাবমিট হওয়া আটকে দেওয়া হচ্ছে
+        event.preventDefault();
+
+        const amountInput = document.getElementById('amount');
+        const form = event.target; // ফর্মটিকে একটি ভেরিয়েবলে রাখা হচ্ছে
+        const amount = amountInput.value;
+        const amountNumber = Number(amount);
+
+        if (amount === '' || amountNumber <= 0 || isNaN(amountNumber)) {
+            // যদি টাকার পরিমাণ ভুল থাকে, তাহলে একটি সুন্দর error পপ-আপ দেখানো হচ্ছে
+            Swal.fire({
+                icon: 'error',
+                title: 'ভুল হয়েছে',
+                text: 'অনুগ্রহ করে একটি সঠিক টাকার পরিমাণ লিখুন।',
+                confirmButtonText: 'ঠিক আছে'
+            });
+            return; // এখান থেকে ফাংশন শেষ
+        }
+
+        // এখন কনফার্মেশনের জন্য SweetAlert2 পপ-আপ দেখানো হচ্ছে
+        Swal.fire({
+            title: 'আপনি কি নিশ্চিত?',
+            text: `আপনি ${amountNumber} টাকা আপনার ওয়ালেটে যুক্ত করতে যাচ্ছেন।`,
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonColor: '#007bff',
+            cancelButtonColor: '#6c757d',
+            confirmButtonText: 'হ্যাঁ, যুক্ত করুন',
+            cancelButtonText: 'না, বাতিল করুন'
+        }).then((result) => {
+            // ব্যবহারকারী 'হ্যাঁ, যুক্ত করুন' বাটনে ক্লিক করলে
+            if (result.isConfirmed) {
+                // **বাগ ফিক্স:** সরাসরি form.submit() এর পরিবর্তে এইভাবে কল করলে তা সব সময় কাজ করবে,
+                // এমনকি যদি সাবমিট বাটনের নাম 'submit' থাকে তবুও।
+                HTMLFormElement.prototype.submit.call(form);
+            }
+        });
+    }
+</script>
+
+{% endblock %}

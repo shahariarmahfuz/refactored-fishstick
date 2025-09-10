@@ -1,0 +1,39 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+<style>
+    .notice-form { background: #f9f9f9; padding: 20px; border-radius: 8px; }
+    textarea { width: 95%; min-height: 100px; padding: 10px; font-size: 1em; }
+    .status-active { color: green; font-weight: bold; }
+    .status-inactive { color: grey; }
+    .notice-status { margin-top: 20px; }
+</style>
+
+<h1>নোটিস ম্যানেজমেন্ট</h1>
+
+<div class="notice-form">
+    <h2>নোটিসের টেক্সট লিখুন</h2>
+    <form action="{{ url_for('admin.save_notice') }}" method="post">
+        <textarea name="content" placeholder="এখানে আপনার নোটিস লিখুন...">{{ notice.content if notice else '' }}</textarea>
+        <br><br>
+        <input type="submit" value="সেভ করুন">
+    </form>
+
+    {% if notice %}
+    <div class="notice-status">
+        <strong>বর্তমান স্ট্যাটাস:</strong>
+        {% if notice.is_active == 1 %}
+            <span class="status-active">Enable</span>
+        {% else %}
+            <span class="status-inactive">Disable</span>
+        {% endif %}
+
+        <form action="{{ url_for('admin.toggle_notice') }}" method="post" style="display:inline; margin-left: 20px;">
+            <button type="submit">
+                {% if notice.is_active == 1 %} Disable করুন {% else %} Enable করুন {% endif %}
+            </button>
+        </form>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,317 @@
+{% extends 'user_layout.html' %}
+{% block content %}
+<link href="https://fonts.googleapis.com/css2?family=Baloo+Da+2:wght@400;600;700&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+
+<style>
+    .payment-body-override {
+        /* Reverted to the original solid background */
+        background: #f9fafb;
+        font-family: 'Baloo Da 2', cursive;
+        margin-top: -30px;
+    }
+
+    .page-header {
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 15px 25px; 
+        box-sizing: border-box;
+        background: #ffffff;
+        border-bottom: 1px solid #e5e7eb;
+    }
+    .nav-icon-btn {
+        background: #f1f5f9;
+        border: 1px solid #e2e8f0;
+        color: #475569;
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 18px;
+        cursor: pointer;
+        text-decoration: none;
+        transition: all 0.2s ease;
+    }
+    .nav-icon-btn:hover {
+        background: #e2e8f0;
+        color: #1e29b;
+        transform: scale(1.05);
+    }
+
+    .payment-page-wrapper {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        gap: 16px;
+        width: 100%;
+        padding: 20px 0; 
+    }
+    .page-title {
+        font-size: 22px;
+        color: #1e293b;
+        font-weight: 700;
+        text-align: center;
+        margin-top: 10px;
+        margin-bottom: 10px;
+    }
+    .container {
+        width: 90%;
+        max-width: 290px;
+        border-radius: 10px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        box-sizing: border-box;
+    }
+    .image-wrapper-container {
+        max-width: 160px;
+        padding: 15px;
+        background: #ffffff;
+        box-shadow: none;
+        border: 1px solid #e5e7eb;
+    }
+    .payment-image {
+        display: block;
+        width: 60%;
+        max-width: 100%;
+        height: auto;
+        margin: 0 auto;
+    }
+    .container.fullcolor {
+        background: {% if payment_method.name == 'Nagad' %}#EC1C24{% elif payment_method.name == 'bKash' %}#CF2772{% endif %};
+        color: #ffffff;
+        padding: 20px 25px;
+    }
+    .container.fullcolor .title {
+        display: block;
+        font-size: 14px;
+        font-weight: normal;
+        margin-bottom: 12px;
+        text-align: center;
+    }
+    .container.fullcolor input[type="text"] {
+        width: 100%;
+        padding: 12px;
+        border-radius: 8px;
+        border: none;
+        outline: none;
+        font-size: 16px;
+        font-family: 'Nunito', sans-serif;
+        box-sizing: border-box;
+    }
+    .instruction-wrapper { text-align: left; margin-top: 15px; }
+    .instruction-item { display: flex; align-items: center; gap: 12px; }
+    .instruction-item .icon { font-size: 18px; width: 20px; text-align: center; color: yellow; }
+    .instruction-text { margin: 0; font-size: 14px; line-height: 1.7; }
+    .separator { margin: 4px 0; width: 100%; border-bottom: 1px solid rgba(255, 255, 255, 0.3); }
+    .highlight-yellow { color: yellow; font-weight: 700; font-family: 'Nunito', sans-serif; }
+    .copy-btn { background: none; border: none; color: yellow; cursor: pointer; font-size: 16px; margin-left: 5px; padding: 0; vertical-align: middle; }
+    .copy-btn:hover { opacity: 0.8; }
+    .container.screenshot-upload { 
+        background: #ffffff; 
+        color: #1e293b; 
+        text-align: center; 
+        padding: 20px 25px; 
+        /* UPDATED: Shadow removed as requested */
+        box-shadow: none;
+        border: 1px solid #e5e7eb;
+    }
+    .or-separator { font-size: 22px; font-weight: 700; margin: 0 0 15px 0; color: #334155; }
+    #screenshotInput { display: none; }
+    .upload-label { display: block; padding: 12px 20px; background-color: #f1f5f9; border: 2px dashed #cbd5e1; border-radius: 8px; cursor: pointer; font-size: 14px; font-weight: 600; color: #475569; transition: background-color 0.2s ease, border-color 0.2s ease; }
+    .upload-label:hover { background-color: #e2e8f0; border-color: #94a3b8; }
+    .upload-label i { margin-right: 8px; }
+    #file-chosen { font-size: 13px; color: #475569; margin-top: 8px; }
+    .upload-note { font-size: 12px; color: #64748b; margin-top: 10px; }
+
+    .form-actions-wrapper {
+        width: 90%;
+        max-width: 290px;
+        display: flex;
+        margin-top: 10px;
+    }
+    .action-btn {
+        flex-grow: 1;
+        border: none;
+        border-radius: 8px;
+        padding: 14px;
+        font-size: 16px;
+        font-family: 'Baloo Da 2', cursive;
+        font-weight: 700;
+        cursor: pointer;
+        text-align: center;
+        text-decoration: none;
+        transition: transform 0.2s ease;
+    }
+    .action-btn:hover {
+        transform: scale(1.02);
+    }
+    .confirm-btn {
+        background-color: #22c55e;
+        color: #ffffff;
+        width: 100%;
+    }
+</style>
+
+<div class="payment-body-override">
+
+    <div class="page-header">
+        <a href="{{ url_for('user_auth.add_funds_payment', amount=amount) }}" class="nav-icon-btn">
+            <i class="fas fa-arrow-left"></i>
+        </a>
+        <button type="button" id="translateBtn" class="nav-icon-btn">
+            <i class="fas fa-language"></i>
+        </button>
+    </div>
+
+    <form class="payment-page-wrapper" method="post" action="{{ url_for('user_auth.submit_deposit', amount=amount) }}" enctype="multipart/form-data">
+        <input type="hidden" name="payment_method" value="{{ payment_method.name }}">
+
+        <h2 class="page-title" data-translate-key="pageTitle">{{ payment_method.name }} এর মাধ্যমে টাকা যোগ করুন</h2>
+
+        <div class="container image-wrapper-container">
+            {% if payment_method.name == 'Nagad' %}
+                <img src="https://pay.offertopup.com/mobilebanklogo/nagad.png" alt="Nagad Payment" class="payment-image">
+            {% elif payment_method.name == 'bKash' %}
+                <img src="https://i.postimg.cc/wBwCmJQR/bkash.png" alt="bKash Payment" class="payment-image">
+            {% endif %}
+        </div>
+
+        <div class="container fullcolor">
+            <b class="title" data-translate-key="txnIdTitle">ট্রান্সজেকশন আইডি দিন</b>
+            <input type="text" name="transaction_id" placeholder="TXN ID লিখুন" data-translate-key="txnIdPlaceholder">
+
+            <div class="instruction-wrapper">
+                <div class="instruction-item"><i class="fas fa-mobile-alt icon"></i><p class="instruction-text" data-translate-key="instruction1">*{% if payment_method.name == 'Nagad' %}167{% else %}247{% endif %}# ডায়াল করে আপনার {{ payment_method.name }} মোবাইল মেনুতে যান অথবা {{ payment_method.name }} অ্যাপে যান।</p></div>
+                <div class="separator"></div>
+                <div class="instruction-item"><i class="fas fa-paper-plane icon"></i><p class="instruction-text" data-translate-key="instruction2"><span class="highlight-yellow">"Send Money"</span> -এ ক্লিক করুন।</p></div>
+                <div class="separator"></div>
+                <div class="instruction-item"><i class="fas fa-user-check icon"></i><p class="instruction-text"><span data-translate-key="instruction3_prefix">প্রাপক নম্বরঃ</span> <span class="highlight-yellow" id="recipientNumber">{{ payment_method.account_number }}</span> <button type="button" class="copy-btn" onclick="copyNumber()"><i class="far fa-copy"></i></button></p></div>
+                <div class="separator"></div>
+                <div class="instruction-item"><i class="fas fa-money-bill-wave icon"></i><p class="instruction-text"><span data-translate-key="instruction4_prefix">টাকার পরিমাণঃ</span> <span class="highlight-yellow">{{ "%.2f"|format(amount) }}</span></p></div>
+                <div class="separator"></div>
+                <div class="instruction-item"><i class="fas fa-key icon"></i><p class="instruction-text" data-translate-key="instruction5">নিশ্চিত করতে এখন আপনার {{ payment_method.name }} মোবাইল মেনু পিন লিখুন।</p></div>
+                <div class="separator"></div>
+                <div class="instruction-item"><i class="fas fa-check-circle icon"></i><p class="instruction-text" data-translate-key="instruction6">সবকিছু ঠিক থাকলে, আপনি {{ payment_method.name }} থেকে একটি নিশ্চিতকরণ বার্তা পাবেন।</p></div>
+                <div class="separator"></div>
+                <div class="instruction-item"><i class="fas fa-receipt icon"></i><p class="instruction-text" data-translate-key="instruction7">আপনার {{ payment_method.name }} মেসেজ থেকে <span class="highlight-yellow">Transaction ID (TrxID)</span> নিয়ে উপরের বক্সে লিখুন।</p></div>
+            </div>
+        </div>
+
+        <div class="container screenshot-upload">
+            <h2 class="or-separator" data-translate-key="orSeparator">অথবা</h2>
+            <input type="file" id="screenshotInput" name="screenshot" accept="image/*" onchange="updateLabel()">
+            <label for="screenshotInput" class="upload-label" data-translate-key="uploadLabel">
+                <i class="fas fa-upload"></i>
+                পেমেন্টের স্ক্রিনশট আপলোড করুন
+            </label>
+            <p id="file-chosen" style="text-align: center; color: #555; margin-top: 5px;" data-translate-key="fileChosen">কোনো ফাইল বাছাই করা হয়নি</p>
+            <p class="upload-note" data-translate-key="uploadNote">(ট্রানজেকশন আইডি অথবা স্ক্রিনশট, যেকোনো একটি আবশ্যক)</p>
+        </div>
+
+        <div class="form-actions-wrapper">
+            <button type="submit" class="action-btn confirm-btn" data-translate-key="submitBtn">অনুরোধ জমা দিন</button>
+        </div>
+    </form>
+</div>
+
+<script>
+    let currentLanguage = 'bn';
+    const paymentMethodName = "{{ payment_method.name }}";
+
+    const translations = {
+        pageTitle: {
+            bn: `${paymentMethodName} এর মাধ্যমে টাকা যোগ করুন`,
+            en: `Add money via ${paymentMethodName}`
+        },
+        txnIdTitle: {
+            bn: 'ট্রান্সজেকশন আইডি দিন',
+            en: 'Enter Transaction ID'
+        },
+        txnIdPlaceholder: {
+            bn: 'TXN ID লিখুন',
+            en: 'Enter TXN ID'
+        },
+        instruction1: {
+            bn: `*{% if payment_method.name == 'Nagad' %}167{% else %}247{% endif %}# ডায়াল করে আপনার ${paymentMethodName} মোবাইল মেনুতে যান অথবা ${paymentMethodName} অ্যাপে যান।`,
+            en: `Go to your ${paymentMethodName} mobile menu by dialing *{% if payment_method.name == 'Nagad' %}167{% else %}247{% endif %}# or use the ${paymentMethodName} app.`
+        },
+        instruction2: {
+            bn: `<span class="highlight-yellow">"Send Money"</span> -এ ক্লিক করুন।`,
+            en: `Click on <span class="highlight-yellow">"Send Money"</span>.`
+        },
+        instruction3_prefix: { bn: 'প্রাপক নম্বরঃ', en: 'Recipient Number:' },
+        instruction4_prefix: { bn: 'টাকার পরিমাণঃ', en: 'Amount:' },
+        instruction5: {
+            bn: `নিশ্চিত করতে এখন আপনার ${paymentMethodName} মোবাইল মেনু পিন লিখুন।`,
+            en: `Now enter your ${paymentMethodName} mobile menu PIN to confirm.`
+        },
+        instruction6: {
+            bn: `সবকিছু ঠিক থাকলে, আপনি ${paymentMethodName} থেকে একটি নিশ্চিতকরণ বার্তা পাবেন।`,
+            en: `If everything is correct, you will receive a confirmation message from ${paymentMethodName}.`
+        },
+        instruction7: {
+            bn: `আপনার ${paymentMethodName} মেসেজ থেকে <span class="highlight-yellow">Transaction ID (TrxID)</span> নিয়ে উপরের বক্সে লিখুন।`,
+            en: `Take the <span class="highlight-yellow">Transaction ID (TrxID)</span> from your ${paymentMethodName} message and write it in the box above.`
+        },
+        orSeparator: { bn: 'অথবা', en: 'OR' },
+        uploadLabel: {
+            bn: '<i class="fas fa-upload"></i> পেমেন্টের স্ক্রিনশট আপলোড করুন',
+            en: '<i class="fas fa-upload"></i> Upload Payment Screenshot'
+        },
+        fileChosen: { bn: 'কোনো ফাইল বাছাই করা হয়নি', en: 'No file chosen' },
+        uploadNote: {
+            bn: '(ট্রানজেকশন আইডি অথবা স্ক্রিনশট, যেকোনো একটি আবশ্যক)',
+            en: '(Transaction ID or screenshot, either one is required)'
+        },
+        submitBtn: { bn: 'অনুরোধ জমা দিন', en: 'Submit Request' },
+        copyAlert: { bn: 'নম্বর কপি করা হয়েছে: ', en: 'Number copied: ' },
+        copyError: { bn: 'কপি করতে ব্যর্থ:', en: 'Failed to copy:' }
+    };
+
+    function copyNumber() {
+        const recipientNumber = document.getElementById('recipientNumber').innerText;
+        navigator.clipboard.writeText(recipientNumber.trim()).then(() => {
+            alert(translations.copyAlert[currentLanguage] + recipientNumber.trim());
+        }).catch(err => {
+            console.error(translations.copyError[currentLanguage], err);
+        });
+    }
+
+    function updateLabel() {
+        const input = document.getElementById('screenshotInput');
+        const output = document.getElementById('file-chosen');
+        if (input.files.length > 0) {
+            output.textContent = input.files[0].name;
+        } else {
+            output.textContent = translations.fileChosen[currentLanguage];
+        }
+    }
+
+    function applyTranslations(lang) {
+        document.querySelectorAll('[data-translate-key]').forEach(element => {
+            const key = element.dataset.translateKey;
+            if (translations[key] && translations[key][lang]) {
+                const translation = translations[key][lang];
+                if (element.nodeName === 'INPUT' && element.type === 'text') {
+                    element.placeholder = translation;
+                } else if (key === 'uploadLabel' || key.startsWith('instruction')) {
+                    element.innerHTML = translation;
+                }
+                 else {
+                    element.textContent = translation;
+                }
+            }
+        });
+        updateLabel();
+    }
+
+    document.getElementById('translateBtn').addEventListener('click', () => {
+        currentLanguage = (currentLanguage === 'bn') ? 'en' : 'bn';
+        applyTranslations(currentLanguage);
+    });
+</script>
+{% endblock %}

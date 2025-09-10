@@ -1,0 +1,391 @@
+{% extends 'user_layout.html' %}
+
+{% block content %}
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;700&display=swap" rel="stylesheet">
+
+<style>
+    /* === Epunda Slab ফন্টটি লোকাল ফাইল থেকে লোড করার নিয়ম === */
+    @font-face {
+      font-family: 'Epunda Slab';
+      src: url("{{ url_for('static', filename='fonts/EpundaSlab-Regular.woff2') }}") format('woff2');
+      font-weight: normal;
+      font-style: normal;
+    }
+
+    /* === ফন্ট ব্যবহারের নতুন নিয়ম === */
+    body {
+        font-family: 'Quicksand', sans-serif; /* ডিফল্ট ফন্ট */
+    }
+    .game-section h2 {
+        font-family: 'Epunda Slab', serif; /* শুধু গেম টাইটেলের জন্য */
+    }
+
+    /* নোটিশ */
+    .notice {
+      background-color: #d4edda;
+      color: #155724;
+      border: 1px solid #c3e6cb;
+      padding: 8px 34px 8px 15px;
+      margin-bottom: 20px;
+      position: relative;
+      border-radius: 6px;
+      font-size: 14px;
+      line-height: 1.4;
+    }
+    .notice p { margin: 0; }
+    .notice .close-btn { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; font-size: 16px; font-weight: bold; color: #155724; cursor: pointer; }
+
+    /* পপ-আপ স্টাইল */
+    #popup { position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: none; justify-content: center; align-items: center; z-index: 1000; padding: 0 1rem; }
+    .popup-box { position: relative; background: #fff; max-width: 480px; width: 100%; border-radius: 6px; box-shadow: 0 10px 25px rgba(0,0,0,0.25); animation: fadeIn 0.3s ease-out; }
+    .popup-box .close-btn { position: absolute; top: -40px; right: -5px; width: 32px; height: 32px; background: #fff; border-radius: 50%; border: 1px solid #ccc; color: #333; font-size: 18px; cursor: pointer; display: flex; justify-content: center; align-items: center; box-shadow: 0 4px 10px rgba(0,0,0,0.2); transition: background 0.2s; z-index: 100; }
+    .popup-box .close-btn:hover { background: #f0f0f0; }
+    .popup-image { width: 100%; aspect-ratio: 16 / 9; overflow: hidden; border-top-left-radius: 6px; border-top-right-radius: 6px; background-color: #f0f0f0; }
+    .popup-image img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .popup-content { padding: 1.5rem; text-align: center; }
+    .popup-content h2 { margin-top: 0; margin-bottom: 0.75rem; font-size: 1.5rem; color: #111; }
+    .popup-content p { font-size: 0.95rem; color: #555; margin-bottom: 1.5rem; line-height: 1.6; }
+    .popup-content a { text-decoration: none; }
+    .popup-content button { padding: 0.6rem 1.5rem; background: #4f46e5; color: #fff; border: none; border-radius: 6px; font-size: 0.9rem; font-weight: bold; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.15); transition: background 0.2s; }
+    .popup-content button:hover { background: #4338ca; }
+    @keyframes fadeIn { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
+
+    /* ব্যানার স্লাইডার */
+    .slider-wrapper { margin-bottom: 30px; }
+    .slider {
+        width: 100%;
+        aspect-ratio: 1280 / 500;
+        overflow: hidden;
+        position: relative;
+        box-shadow: 0 6px 18px rgba(0,0,0,0.12);
+        background: #f0f0f0;
+        cursor: grab;
+        border-radius: 0;
+    }
+    .slider.grabbing { cursor: grabbing; }
+    .slider .track { display: flex; height: 100%; }
+    .slider .slide { flex: 0 0 100%; }
+    .slider .slide img { width: 100%; height: 100%; object-fit: cover; display: block; user-select: none; pointer-events: none; }
+    .dots { display: flex; justify-content: center; gap: 8px; margin-top: 12px; }
+    .dot { width: 10px; height: 10px; border-radius: 50%; background: #ccc; cursor: pointer; transition: background 0.3s; }
+    .dot.active { background: #333; }
+
+    /* গেম সেকশন */
+    .game-section { margin-top: 20px; }
+    .game-section h2 {
+        border-bottom: 2px solid #eee;
+        padding-bottom: 10px;
+        margin-bottom: 20px;
+        text-align: center;
+    }
+    .category-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+        gap: 15px;
+    }
+
+    /* === ক্যাটাগরি কার্ডের পরিবর্তন === */
+    .category-card {
+        text-decoration: none;
+        color: inherit;
+        border: none;
+        border-radius: 8px;
+        overflow: hidden;
+        background: transparent;
+        transition: transform .2s ease-out;
+        display: flex;
+        flex-direction: column;
+    }
+    .category-card:hover {
+        transform: translateY(-5px);
+    }
+    .category-card .category-image {
+        aspect-ratio: 1/1;
+        border: 1px solid #eee;
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.08); /* পরিবর্তন: শ্যাডো শুধু ছবিতে যুক্ত করা হয়েছে */
+    }
+    .category-card img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+    }
+    .category-card .category-name {
+        padding: 8px 5px 0 5px;
+        text-align: center;
+        font-weight: bold;
+        font-size: 0.9em;
+        border-top: none;
+        margin-top: 0;
+    }
+</style>
+
+{% if notice and notice.content %}
+<div class="notice" id="noticeBox">
+    <p>{{ notice.content }}</p>
+    <button class="close-btn" onclick="closeNotice()">×</button>
+</div>
+{% endif %}
+
+{% if popup %}
+<div id="popup">
+  <div class="popup-box">
+    <button class="close-btn" onclick="closePopup()">✕</button>
+    {% if popup.image_url %}
+    <div class="popup-image">
+      <img src="{{ popup.image_url }}" alt="{{ popup.title or 'Popup Image' }}">
+    </div>
+    {% endif %}
+    <div class="popup-content">
+      <h2>{{ popup.title }}</h2>
+      <p>{{ popup.content }}</p>
+      {% if popup.button_text and popup.button_url %}
+        <a href="{{ popup.button_url }}" target="_blank">
+            <button>{{ popup.button_text }}</button>
+        </a>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endif %}
+
+<div class="content-wrapper">
+
+    {% if banners and banners|length > 0 %}
+    <div class="slider-wrapper">
+        <div class="slider" id="slider">
+            <div class="track" id="track">
+                {% for banner in banners %}
+                <div class="slide">
+                    <a href="{{ banner.target_url or '#' }}" target="_blank">
+                        <img src="{{ banner.image_url }}" alt="Banner Image">
+                    </a>
+                </div>
+                {% endfor %}
+                {% if banners|length > 1 %}
+                <div class="slide">
+                    <a href="{{ banners[0].target_url or '#' }}" target="_blank">
+                        <img src="{{ banners[0].image_url }}" alt="Banner Image Duplicate">
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        {% if banners|length > 1 %}
+        <div class="dots" id="dots">
+            {% for banner in banners %}
+            <div class="dot {% if loop.first %}active{% endif %}" data-index="{{ loop.index0 }}"></div>
+            {% endfor %}
+        </div>
+        {% endif %}
+    </div>
+    {% endif %}
+
+    {% for data in games_data %}
+        <div class="game-section">
+            <h2>{{ data.game.title }}</h2>
+            {% if data.categories %}
+                <div class="category-grid">
+                {% for category in data.categories %}
+                    <a href="{{ url_for('views.view_category', category_id=category.id) }}" class="category-card">
+                        <div class="category-image">
+                            <img src="{{ category.image_url }}" alt="{{ category.name }}">
+                        </div>
+                        <div class="category-name">
+                            {{ category.name }}
+                        </div>
+                    </a>
+                {% endfor %}
+                </div>
+            {% else %}
+                <p>এই গেমের জন্য কোনো ক্যাটেগরি যোগ করা হয়নি।</p>
+            {% endif %}
+        </div>
+    {% endfor %}
+
+</div>
+
+
+<script>
+// === এখানে পরিবর্তন করা হয়েছে ===
+// একটি IIFE (Immediately Invoked Function Expression) ব্যবহার করা হয়েছে
+// যাতে ভেতরের ভ্যারিয়েবলগুলো বাইরের কোনো কোডের সাথে সংঘর্ষ না করে।
+(function () {
+    const HIDE_DURATION_MS = 30 * 60 * 1000;
+
+    // নোটিশ এবং পপ-আপ বন্ধ করার ফাংশনগুলো বাইরে রাখা হয়েছে
+    // যাতে HTML থেকে onclick এ কল করা যায়।
+    const noticeBox = document.getElementById("noticeBox");
+    if (noticeBox) {
+        const noticeHideUntil = localStorage.getItem('noticeHideUntil');
+        if (noticeHideUntil && new Date().getTime() < parseInt(noticeHideUntil)) {
+            noticeBox.style.display = 'none';
+        }
+    }
+    window.closeNotice = function() {
+        const expiryTime = new Date().getTime() + HIDE_DURATION_MS;
+        localStorage.setItem('noticeHideUntil', expiryTime);
+        if (noticeBox) {
+            noticeBox.style.display = "none";
+        }
+    }
+
+    const popup = document.getElementById('popup');
+    window.closePopup = function() {
+        const expiryTime = new Date().getTime() + HIDE_DURATION_MS;
+        localStorage.setItem('popupHideUntil', expiryTime);
+        if (popup) {
+            popup.style.display = 'none';
+        }
+    }
+
+    // DOMContentLoaded নিশ্চিত করে যে সমস্ত HTML এবং CSS লোড হওয়ার পরেই
+    // ভেতরের কোডটি রান হবে। এটিই মূল সমাধান।
+    document.addEventListener('DOMContentLoaded', () => {
+        // পপ-আপ দেখানোর লজিক
+        if (popup) {
+            const popupHideUntil = localStorage.getItem('popupHideUntil');
+            if (!popupHideUntil || new Date().getTime() > parseInt(popupHideUntil)) {
+                popup.style.display = 'flex';
+            }
+        }
+
+        // --- স্লাইডারের সমস্ত কোড এখন DOMContentLoaded এর ভেতরে ---
+        const slider = document.getElementById('slider');
+        if (slider) {
+            const track = document.getElementById('track');
+            const dots = Array.from(document.querySelectorAll('.dot'));
+            const totalSlides = {{ banners|length }};
+
+            if (totalSlides > 1) {
+                const lastSlide = track.children[totalSlides - 1];
+                const lastSlideClone = lastSlide.cloneNode(true);
+                track.insertBefore(lastSlideClone, track.children[0]);
+
+                let index = 1;
+                let autoPlayInterval = null;
+                const autoPlayDelay = 4000;
+                let isDragging = false, startPos = 0, currentTranslate = 0, prevTranslate = 0, animationFrameId;
+
+                function setInitialPosition() {
+                    currentTranslate = -index * slider.offsetWidth;
+                    track.style.transform = `translateX(${currentTranslate}px)`;
+                    prevTranslate = currentTranslate;
+                }
+                setInitialPosition();
+
+                function setSliderPosition() {
+                    track.style.transform = `translateX(${currentTranslate}px)`;
+                }
+
+                function updateSliderPositionByIndex(transition = true) {
+                    if (transition) {
+                        track.style.transition = 'transform 0.5s ease-out';
+                    } else {
+                        track.style.transition = 'none';
+                    }
+                    currentTranslate = -index * slider.offsetWidth;
+                    prevTranslate = currentTranslate;
+                    setSliderPosition();
+
+                    dots.forEach(d => d.classList.remove('active'));
+                    if (index === 0) {
+                        dots[totalSlides - 1].classList.add('active');
+                    } else if (index === totalSlides + 1) {
+                        dots[0].classList.add('active');
+                    } else {
+                        dots[index - 1].classList.add('active');
+                    }
+                }
+
+                function next() {
+                    if (index >= totalSlides + 1) return;
+                    index++;
+                    updateSliderPositionByIndex();
+                }
+
+                function prev() {
+                    if (index <= 0) return;
+                    index--;
+                    updateSliderPositionByIndex();
+                }
+
+                function startAutoPlay() {
+                    stopAutoPlay();
+                    autoPlayInterval = setInterval(next, autoPlayDelay);
+                }
+
+                function stopAutoPlay() {
+                    clearInterval(autoPlayInterval);
+                }
+
+                dots.forEach((dot, dotIndex) => {
+                    dot.addEventListener('click', () => {
+                        index = dotIndex + 1;
+                        updateSliderPositionByIndex();
+                        startAutoPlay();
+                    });
+                });
+
+                slider.addEventListener('mouseenter', stopAutoPlay);
+                slider.addEventListener('mouseleave', startAutoPlay);
+
+                function dragStart(e) { stopAutoPlay(); isDragging = true; startPos = getPositionX(e); animationFrameId = requestAnimationFrame(animation); slider.classList.add('grabbing'); track.style.transition = 'none'; }
+                function getPositionX(e) { return e.type.includes('mouse') ? e.pageX : e.touches[0].clientX; }
+                function animation() { setSliderPosition(); if (isDragging) requestAnimationFrame(animation); }
+                function drag(e) { if (isDragging) { const currentPosition = getPositionX(e); currentTranslate = prevTranslate + currentPosition - startPos; } }
+
+                function dragEnd() {
+                    if (!isDragging) return;
+                    isDragging = false;
+                    cancelAnimationFrame(animationFrameId);
+                    slider.classList.remove('grabbing');
+                    const movedBy = currentTranslate - prevTranslate;
+
+                    if (movedBy < -100) next();
+                    else if (movedBy > 100) prev();
+                    else updateSliderPositionByIndex();
+                }
+
+                track.addEventListener('transitionend', () => {
+                    if (index === 0) {
+                        index = totalSlides;
+                        updateSliderPositionByIndex(false);
+                    }
+                    if (index === totalSlides + 1) {
+                        index = 1;
+                        updateSliderPositionByIndex(false);
+                    }
+                    startAutoPlay();
+                });
+
+                slider.addEventListener('mousedown', dragStart);
+                slider.addEventListener('touchstart', dragStart, { passive: true });
+                slider.addEventListener('mouseup', dragEnd);
+                slider.addEventListener('mouseleave', dragEnd);
+                slider.addEventListener('touchend', dragEnd);
+                slider.addEventListener('mousemove', drag);
+                slider.addEventListener('touchmove', drag, { passive: true });
+
+                track.querySelectorAll('a').forEach(a => {
+                    a.addEventListener('click', (e) => {
+                        if (isDragging && Math.abs(currentTranslate - prevTranslate) > 5) e.preventDefault();
+                    });
+                });
+
+                window.addEventListener('resize', () => {
+                    track.style.transition = 'none';
+                    setInitialPosition();
+                });
+
+                startAutoPlay();
+            }
+        }
+    });
+})();
+</script>
+{% endblock %}

@@ -1,0 +1,12 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+    <h2>অ্যাডমিন লগইন</h2>
+    <form method="post">
+        <label for="username">ইউজারনেম:</label><br>
+        <input type="text" name="username" required><br>
+        <label for="password">পাসওয়ার্ড:</label><br>
+        <input type="password" name="password" required><br><br>
+        <input type="submit" value="লগইন করুন">
+    </form>
+{% endblock %}

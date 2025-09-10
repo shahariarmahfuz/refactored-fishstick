@@ -1,0 +1,44 @@
+{% extends 'admin_layout.html' %}
+{% block content %}
+    <h1>Edit Product: {{ product.name }}</h1>
+    <div class="form-section">
+        <form method="post">
+            <label for="category_id">Select Category:</label>
+            <select name="category_id" required>
+                {% for category in categories %}
+                <option value="{{ category.id }}" {% if category.id == product.category_id %}selected{% endif %}>
+                    {{ category.game_title }} > {{ category.name }}
+                </option>
+                {% endfor %}
+            </select>
+            <label for="name">Product Name:</label>
+            <input type="text" name="name" value="{{ product.name }}" required>
+            <label for="price">Price:</label>
+            <input type="number" name="price" step="0.01" value="{{ product.price }}" required>
+
+            <div style="margin-top: 10px; margin-bottom: 10px;">
+                <label>
+                    <input type="checkbox" name="is_limited" onchange="toggleStock(this)" {% if product.is_limited %}checked{% endif %}>
+                    Limit Stock
+                </label>
+            </div>
+            <div id="stock-field" style="display: {% if product.is_limited %}block{% else %}none{% endif %};">
+                <label for="stock">Available Stock:</label>
+                <input type="number" name="stock" min="0" value="{{ product.stock or '' }}">
+            </div>
+
+            <div>
+                <label for="restriction_days">UID Restriction (in days, 0 for none):</label>
+                <input type="number" name="restriction_days" min="0" value="{{ product.restriction_days or 0 }}">
+            </div>
+
+            <input type="submit" value="Update Product">
+            <a href="{{ url_for('admin.view_products_by_category', category_id=product.category_id) }}" class="button btn-secondary">Cancel</a>
+        </form>
+    </div>
+<script>
+function toggleStock(checkbox) {
+    document.getElementById('stock-field').style.display = checkbox.checked ? 'block' : 'none';
+}
+</script>
+{% endblock %}

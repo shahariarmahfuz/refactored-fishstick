@@ -1,0 +1,195 @@
+{% extends 'user_layout.html' %}
+{% block content %}
+<style>
+    /* --- General Page Style --- */
+    body {
+        /* Font changed to Quicksand */
+        font-family: 'Quicksand', sans-serif; 
+        background-color: #f8f9fa;
+    }
+
+    /* --- Main container for mobile padding --- */
+    .orders-container {
+        padding: 0 15px;
+        max-width: 800px;
+        margin: 0 auto;
+    }
+
+    h1 {
+        color: #2c3e50;
+        margin: 25px 0;
+        font-size: 1.8em;
+        font-weight: 700; /* Quicksand looks better with a bolder heading */
+        text-align: center;
+    }
+
+    /* --- Modern, Cleaner Order Card --- */
+    .order-card {
+        background: #ffffff;
+        border-radius: 15px;
+        margin-bottom: 20px;
+        box-shadow: 0 5px 20px rgba(41, 128, 185, 0.08);
+        border: none;
+        padding: 20px;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .order-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 8px 25px rgba(41, 128, 185, 0.12);
+    }
+
+    /* --- Card Header: Package, Price, and Status --- */
+    .card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 15px;
+        margin-bottom: 18px;
+    }
+
+    .package-name {
+        font-size: 1.15em;
+        font-weight: 700;
+        color: #34495e;
+        margin: 0;
+    }
+
+    .package-price {
+        font-size: 1.2em;
+        font-weight: 700;
+        color: #27ae60;
+        white-space: nowrap;
+    }
+
+    /* --- Card Body: Order Details --- */
+    .order-details {
+        font-size: 0.95em;
+        color: #555;
+        padding-left: 5px;
+    }
+
+    .detail-item {
+        display: flex;
+        align-items: center;
+        margin-bottom: 12px;
+    }
+    .detail-item:last-child {
+        margin-bottom: 0;
+    }
+
+    .detail-item i {
+        color: #95a5a6;
+        margin-right: 15px;
+        font-size: 1.1em;
+        width: 20px;
+        text-align: center;
+    }
+
+    .detail-item strong {
+        color: #7f8c8d;
+        font-weight: 600;
+        margin-right: 8px;
+    }
+
+    /* --- Card Footer: Status and Completion Time --- */
+    .card-footer {
+        margin-top: 18px;
+        padding-top: 15px;
+        border-top: 1px solid #ecf0f1;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    .order-id {
+        font-size: 0.85em;
+        color: #7f8c8d;
+        font-weight: 600;
+    }
+
+    /* --- Status Pill Design --- */
+    .status {
+        font-weight: 700;
+        padding: 6px 14px;
+        border-radius: 50px;
+        font-size: 0.8em;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    .status-completed { color: #27ae60; background-color: rgba(39, 174, 96, 0.1); }
+    .status-pending { color: #f39c12; background-color: rgba(243, 156, 18, 0.1); }
+    .status-rejected { color: #e74c3c; background-color: rgba(231, 76, 60, 0.1); }
+
+    /* For "No orders yet" message */
+    .no-orders-message {
+        text-align: center;
+        padding: 40px 20px;
+        background-color: #fff;
+        border-radius: 15px;
+        box-shadow: 0 5px 20px rgba(41, 128, 185, 0.05);
+    }
+    .no-orders-message p {
+        margin: 0;
+        font-size: 1.1em;
+        color: #7f8c8d;
+    }
+</style>
+
+<div class="orders-container">
+    <h1>My Orders</h1>
+
+    {% for order in orders %}
+    <div class="order-card">
+        <div class="card-header">
+            <div>
+                <p class="package-name">{{ order.product_name }}</p>
+            </div>
+            <div class="package-price">
+                ৳ {{ "%.2f"|format(order.price) }}
+            </div>
+        </div>
+
+        <div class="order-details">
+            <div class="detail-item">
+                <i class="fas fa-id-card"></i>
+                <span><strong>Player ID:</strong> {{ order.game_uid }}</span>
+            </div>
+            <div class="detail-item">
+                <i class="fas fa-calendar-alt"></i>
+                <span><strong>Date:</strong> {{ order.order_time | bst_time }}</span>
+            </div>
+             {% if order.status == 'Completed' and order.completion_time %}
+                <div class="detail-item">
+                     <i class="fas fa-check-circle"></i>
+                    <span><strong>Completed:</strong> {{ order.completion_time | bst_time }}</span>
+                </div>
+            {% endif %}
+        </div>
+
+        <div class="card-footer">
+            <div class="order-id">
+                Order #{{ order.id }}
+            </div>
+            <div>
+                {% if order.status == 'Completed' %}
+                    <span class="status status-completed">Completed</span>
+                {% elif order.status == 'Pending' or order.status == 'Pending Payment' %}
+                    <span class="status status-pending">Pending</span>
+                {% elif order.status == 'Rejected' %}
+                    <span class="status status-rejected">Rejected</span>
+                {% else %}
+                    <span>{{ order.status }}</span>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="no-orders-message">
+        <p>You have not placed any orders yet.</p>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

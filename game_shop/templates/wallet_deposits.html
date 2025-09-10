@@ -1,0 +1,66 @@
+{% extends 'admin_layout.html' %}
+{% block content %}
+<style>
+    .deposit-table th, .deposit-table td {
+        vertical-align: middle;
+    }
+    .action-forms {
+        display: flex;
+        gap: 10px;
+    }
+    .action-forms form {
+        margin-top: 0;
+    }
+</style>
+
+<h1>ওয়ালেট ডিপোজিট অনুরোধ</h1>
+<p>এখানে ব্যবহারকারীদের টাকা যোগ করার পেন্ডিং অনুরোধগুলো দেখানো হচ্ছে।</p>
+
+<div style="overflow-x: auto;">
+    <table class="deposit-table">
+        <thead>
+            <tr>
+                <th>ইউজারনেম</th>
+                <th>টাকার পরিমাণ</th>
+                <th>পেমেন্ট মেথড</th>
+                <th>পেমেন্ট তথ্য</th>
+                <th>অ্যাকশন</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for deposit in deposits %}
+            <tr>
+                <td><strong>{{ deposit.username }}</strong></td>
+                <td>{{ "%.2f"|format(deposit.amount) }} টাকা</td>
+                <td>{{ deposit.payment_method }}</td>
+                <td>
+                    {% if deposit.transaction_id %}
+                        <strong>TrxID:</strong> {{ deposit.transaction_id }}<br>
+                    {% endif %}
+                    {% if deposit.screenshot_url %}
+                        <a href="{{ deposit.screenshot_url }}" target="_blank">স্ক্রিনশট দেখুন</a>
+                    {% endif %}
+                </td>
+                <td>
+                    <div class="action-forms">
+                        <form action="{{ url_for('admin.update_deposit', deposit_id=deposit.id) }}" method="post">
+                            <input type="hidden" name="status" value="Approved">
+                            <button type="submit" onclick="return confirm('আপনি কি এই অনুরোধটি Approve করতে চান? টাকা ইউজারের ওয়ালেটে যোগ হয়ে যাবে।')">Approve</button>
+                        </form>
+                        <form action="{{ url_for('admin.update_deposit', deposit_id=deposit.id) }}" method="post">
+                            <input type="hidden" name="status" value="Rejected">
+                            <button type="submit" class="btn-danger" onclick="return confirm('আপনি কি এই অনুরোধটি Reject করতে চান?')">Reject</button>
+                        </form>
+                    </div>
+                </td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="5" style="text-align: center;">কোনো পেন্ডিং ডিপোজিট অনুরোধ নেই।</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+{% endblock %}

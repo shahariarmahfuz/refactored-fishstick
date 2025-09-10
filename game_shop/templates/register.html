@@ -1,0 +1,151 @@
+{% extends 'user_layout.html' %}
+{% block content %}
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500;700&display=swap" rel="stylesheet">
+
+<style>
+    /* বেসিক রিসেট এবং ফন্ট */
+    body {
+        font-family: 'Quicksand', sans-serif;
+        background-color: #f0f2f5;
+    }
+
+    /* মূল কন্টেইনার */
+    .auth-container {
+        max-width: 420px;
+        margin: 50px auto;
+        padding: 2.5rem;
+        background-color: #ffffff;
+        border-radius: 10px;
+        box-shadow: 0 4px 25px rgba(0, 0, 0, 0.1);
+        box-sizing: border-box;
+    }
+
+    /* ফর্মের হেডিং */
+    .auth-form h2 {
+        margin-top: 0;
+        margin-bottom: 0.5rem;
+        font-size: 2.2rem;
+        font-weight: 700;
+        color: #1c1c1e;
+        text-align: center;
+    }
+
+    .auth-form p {
+        margin-bottom: 2rem;
+        color: #6c757d;
+        text-align: center;
+    }
+
+    /* ইনপুট গ্রুপ (লেবেল + ইনপুট ফিল্ড) */
+    .input-group {
+        margin-bottom: 1.5rem;
+    }
+
+    .input-group label {
+        display: block;
+        margin-bottom: 0.5rem;
+        font-weight: 500;
+        color: #343a40;
+    }
+
+    .input-group input {
+        width: 100%;
+        padding: 0.75rem 1rem;
+        border: 1px solid #ced4da;
+        border-radius: 8px;
+        font-size: 1rem;
+        font-family: 'Quicksand', sans-serif;
+        box-sizing: border-box;
+        transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .input-group input:focus {
+        outline: none;
+        border-color: #007bff;
+        box-shadow: 0 0 8px rgba(0, 123, 255, 0.25);
+    }
+
+    /* Flask-WTF থেকে আসা এরর মেসেজের জন্য স্টাইল */
+    .error-message {
+        color: #dc3545; /* Standard red for errors */
+        font-size: 0.875rem;
+        margin-top: 5px;
+        display: block;
+    }
+
+    /* সাবমিট বাটন */
+    .auth-form input[type="submit"] {
+        width: 100%;
+        padding: 0.85rem;
+        margin-top: 0.5rem;
+        background: linear-gradient(90deg, #28a745, #218838); /* Green gradient for register */
+        border: none;
+        border-radius: 8px;
+        color: #ffffff;
+        font-size: 1.1rem;
+        font-weight: 700;
+        font-family: 'Quicksand', sans-serif;
+        cursor: pointer;
+        transition: opacity 0.3s ease;
+    }
+
+    .auth-form input[type="submit"]:hover {
+        opacity: 0.9;
+    }
+
+    /* ফর্ম ফুটার */
+    .form-footer {
+        text-align: center;
+        margin-top: 1.5rem;
+    }
+
+    .form-footer p {
+        margin: 0;
+        color: #6c757d;
+    }
+
+    .form-footer a {
+        color: #007bff;
+        text-decoration: none;
+        font-weight: 700;
+    }
+     .form-footer a:hover {
+        text-decoration: underline;
+    }
+
+</style>
+
+<div class="auth-container">
+    <form method="post" class="auth-form" novalidate>
+        {{ form.hidden_tag() }}
+
+        <h2>Create an Account</h2>
+        <p>Get started by filling out the form below.</p>
+
+        <div class="input-group">
+            {{ form.username.label }}
+            {{ form.username(placeholder="Choose a username") }}
+            {% for error in form.username.errors %}
+                <span class="error-message">{{ error }}</span>
+            {% endfor %}
+        </div>
+
+        <div class="input-group">
+            {{ form.password.label }}
+            {{ form.password(placeholder="Create a strong password") }}
+            {% for error in form.password.errors %}
+                <span class="error-message">{{ error }}</span>
+            {% endfor %}
+        </div>
+
+        {{ form.submit() }}
+
+        <div class="form-footer">
+            <p>Already have an account? <a href="{{ url_for('user_auth.login') }}">Sign In</a></p>
+        </div>
+    </form>
+</div>
+
+{% endblock %}

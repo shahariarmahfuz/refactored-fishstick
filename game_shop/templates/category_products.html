@@ -1,0 +1,418 @@
+{% extends 'user_layout.html' %}
+{% block content %}
+<style>
+  /* --- Variable Colors --- */
+  :root {
+    --primary-purple: #6A0DAD; /* মূল বেগুনি রঙ */
+    --text-dark: #333;
+    --text-light: #666;
+    --border-light: #ddd;
+    --border-medium: #ccc;
+    /* মূল বেগুনি রঙের উপর ভিত্তি করে গ্লাস ইফেক্ট */
+    --glass-background: rgba(106, 13, 173, 0.15);
+    --glass-background-strong: rgba(106, 13, 173, 0.7);
+    --glass-border: rgba(255, 255, 255, 0.2);
+    --success-green: #28a745;
+    --danger-red: #dc3545;
+  }
+
+  body {
+    background: #f5f5ff; /* হালকা বেগুনি ব্যাকগ্রাউন্ড */
+  }
+
+  /* --- টেমপ্লেট কন্টেইনার এর জন্য কিছু বেসিক স্টাইল --- */
+  .main-content-container {
+      width: 95%; /* কন্টেইনারটি স্ক্রিনের ৯৫% জায়গা জুড়ে থাকবে */
+      max-width: 1200px; /* তবে সর্বোচ্চ ১২০০px এর বেশি চওড়া হবে না */
+      margin: 20px auto; /* উপরে-নিচে মার্জিন এবং ডানে-বামে অটো (মাঝখানে রাখার জন্য) */
+      padding: 10px;
+  }
+
+  /* --- Top Container --- */
+  .category-container {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    margin: 0 auto;
+    background: #fff;
+    overflow: hidden;
+    border: 1px solid var(--border-light);
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  }
+
+  .image-container {
+    width: 80px;
+    height: 80px;
+    flex-shrink: 0;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .image-container img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .text-container {
+    padding: 0 15px;
+    flex-grow: 1;
+  }
+
+  .text-container h1 {
+    margin: 0;
+    font-size: 1.1rem;
+    color: var(--text-dark);
+    font-weight: 600;
+  }
+
+  .breadcrumb {
+    margin: 4px 0 0 0;
+    font-size: 0.75rem;
+    color: var(--text-light);
+    line-height: 1.3;
+  }
+   .breadcrumb a { color: var(--primary-purple); text-decoration: none; }
+   .breadcrumb a:hover { text-decoration: underline; }
+
+  /* --- Common Container Style --- */
+  .styled-container {
+    width: 100%;
+    margin: 15px auto 0 auto;
+    background: #fff;
+    border: 1px solid var(--border-light);
+    border-radius: 8px;
+    padding: 15px;
+    box-sizing: border-box;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  }
+
+  .styled-container h3 {
+    margin: 0 0 15px 0;
+    padding-bottom: 12px;
+    font-size: 1rem;
+    color: var(--text-dark);
+    font-weight: 600;
+    border-bottom: 1px solid #eee;
+  }
+
+  /* --- Product Selection Grid --- */
+  .options-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 10px;
+  }
+
+  .option-item {
+    border: 1px solid var(--border-medium);
+    border-radius: 5px;
+    padding: 12px 5px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .option-item input[type="radio"] { display: none; }
+  .item-name { font-size: 0.9rem; color: var(--text-dark); font-weight: 600; }
+  .item-price { font-size: 0.8rem; color: var(--primary-purple); margin-top: 4px; font-weight: bold; }
+  .option-item:hover { border-color: var(--primary-purple); }
+
+  .option-item.active {
+    background-color: var(--glass-background);
+    border-color: var(--primary-purple);
+    box-shadow: 0 0 0 2px rgba(106, 13, 173, 0.2);
+  }
+  .option-item.active .item-name, .option-item.active .item-price { color: var(--primary-purple); }
+
+  /* --- Stock Tags --- */
+  .item-stock {
+    position: absolute;
+    top: 0;
+    right: 0;
+    color: white;
+    font-size: 0.65rem;
+    font-weight: 600;
+    padding: 2px 6px;
+    border-bottom-left-radius: 5px;
+    border: 1px solid var(--glass-border);
+  }
+  .in-stock { background: var(--success-green); }
+  .out-of-stock-tag { background: var(--danger-red); }
+
+  /* --- Out of Stock State --- */
+  .option-item.out-of-stock {
+    cursor: not-allowed;
+    background-color: #f8f8f8;
+  }
+  .option-item.out-of-stock .item-name, .option-item.out-of-stock .item-price { color: #b0b0b0; }
+  .option-item.out-of-stock:hover { border-color: var(--border-medium); background-color: #f8f8f8; }
+
+  /* --- UID Input Field --- */
+  .input-wrapper { position: relative; }
+  .input-icon {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 20px;
+      height: 20px;
+      fill: #aaa;
+      transition: fill 0.2s ease-in-out;
+  }
+  .uid-input {
+      width: 100%;
+      padding: 12px 15px 12px 45px;
+      border: 1px solid var(--border-medium);
+      border-radius: 5px;
+      font-size: 1rem;
+      box-sizing: border-box;
+      transition: all 0.2s ease-in-out;
+  }
+  .uid-input:focus {
+      outline: none;
+      border-color: var(--primary-purple);
+      box-shadow: 0 0 0 3px rgba(106, 13, 173, 0.2);
+  }
+  .uid-input:focus ~ .input-icon { fill: var(--primary-purple); }
+
+  /* --- Payment Method Layout --- */
+  .payment-options-wrapper {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+      gap: 15px;
+  }
+
+  .payment-option {
+      border: 2px solid var(--border-medium);
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s ease-in-out;
+      overflow: hidden;
+      padding: 5px;
+      background-color: #fff;
+  }
+  .payment-option input[type="radio"] { display: none; }
+  .payment-option img { width: 100%; display: block; border-radius: 5px; }
+  .payment-option.active {
+      border-color: var(--primary-purple);
+      box-shadow: 0 0 0 3px rgba(106, 13, 173, 0.2);
+  }
+  .payment-divider { height: 1px; background-color: #eee; margin: 20px 0; }
+
+  /* -- [CHANGE] Payment total text made smaller -- */
+  .payment-total-amount {
+      text-align: center;
+      font-size: 1rem; /* ফন্ট সাইজ ছোট করা হয়েছে */
+      font-weight: 600;
+      color: var(--text-dark);
+      padding: 10px;
+      background: #f5f5ff;
+      border-radius: 5px;
+      margin-bottom: 15px;
+  }
+
+  /* --- Buy Now Button Style --- */
+  .buy-now-btn {
+      display: block;
+      width: 100%;
+      background-color: var(--primary-purple);
+      color: #fff;
+      text-align: center;
+      padding: 12px;
+      font-size: 1.1rem;
+      font-weight: bold;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.2s ease-in-out;
+  }
+  .buy-now-btn:hover { background-color: #5a0b94; }
+
+  /* --- [NEW] Rules & Conditions Style --- */
+  .rules-content {
+      /* white-space: pre-wrap; is no longer needed as JS handles line breaks */
+      background-color: #fdfdff;
+      padding: 5px 15px;
+      border-radius: 5px;
+      border: 1px solid #eee;
+  }
+  .rule-item {
+      display: flex;
+      align-items: flex-start;
+      margin: 12px 0;
+      line-height: 1.6;
+      color: var(--text-dark);
+      font-size: 0.9em;
+  }
+  .rule-item-icon {
+      flex-shrink: 0;
+      width: 18px;
+      height: 18px;
+      margin-right: 10px;
+      margin-top: 2px;
+      fill: var(--primary-purple);
+  }
+</style>
+
+<div class="main-content-container">
+
+    <div class="category-container">
+      <div class="image-container">
+        <img src="{{ category.image_url }}" alt="{{ category.name }}">
+      </div>
+      <div class="text-container">
+        <h1>{{ category.name }}</h1>
+        <p class="breadcrumb">
+            <a href="{{ url_for('views.home') }}">Home</a> &gt; {{ category.game_title }} &gt; <strong>{{ category.name }}</strong>
+        </p>
+      </div>
+    </div>
+
+    {% if products %}
+    <form method="post" class="order-form">
+        <div class="styled-container">
+          <h3>একটি প্রোডাক্ট সিলেক্ট করুন:</h3>
+          <div class="options-grid" id="productOptions">
+            {% for product in products %}
+            <label class="option-item {% if product.is_limited and product.stock <= 0 %}out-of-stock{% endif %}" data-price="{{ product.price }}">
+                <input type="radio" name="product_id" value="{{ product.id }}" required {% if product.is_limited and product.stock <= 0 %}disabled{% endif %}>
+                <div class="item-name">{{ product.name }}</div>
+                <div class="item-price">{{ product.price }} টাকা</div>
+                {% if product.is_limited %}
+                    {% if product.stock > 0 %}
+                        <div class="item-stock in-stock">{{ product.stock }} LEFT</div>
+                    {% else %}
+                        <div class="item-stock out-of-stock-tag">OUT OF STOCK</div>
+                    {% endif %}
+                {% endif %}
+            </label>
+            {% endfor %}
+          </div>
+        </div>
+
+        <div class="styled-container">
+            <h3>আপনার গেম UID দিন:</h3>
+            <div class="input-wrapper">
+              <input type="text" id="game_uid" name="game_uid" class="uid-input" placeholder="Enter your Game UID here" required>
+              <svg class="input-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-3.5-6.5c.83 0 1.5-.67 1.5-1.5s-.67-1.5-1.5-1.5-1.5.67-1.5 1.5.67 1.5 1.5 1.5zm7 0c.83 0 1.5-.67 1.5-1.5s-.67-1.5-1.5-1.5-1.5.67-1.5 1.5.67 1.5 1.5 1.5zm-3.5-5c.83 0 1.5-.67 1.5-1.5S12.83 5.5 12 5.5s-1.5.67-1.5 1.5.67 1.5 1.5 1.5z"/></svg>
+            </div>
+        </div>
+
+        <div class="styled-container">
+            <h3>পেমেন্ট অপশন সিলেক্ট করুন:</h3>
+            <div class="payment-options-wrapper" id="paymentOptions">
+                <label class="payment-option">
+                    <input type="radio" name="payment_option" value="wallet">
+                    <img src="https://i.ibb.co.com/B5MkxFrN/Google-AI-Studio-2025-09-09-T07-30-25-151-Z.png" alt="Pay from Wallet">
+                </label>
+                <label class="payment-option active">
+                    <input type="radio" name="payment_option" value="online" checked>
+                    <img src="https://i.postimg.cc/G2bPJ9z3/20250909-134802.jpg" alt="Pay Online">
+                </label>
+            </div>
+            <div class="payment-divider"></div>
+            <div class="payment-total-amount" id="paymentTotal">আপনাকে পেমেন্ট করতে হবে: 0 টাকা</div>
+            <input type="submit" class="buy-now-btn" value="চেকআউট করুন">
+        </div>
+    </form>
+    {% else %}
+        <div class="styled-container" style="text-align: center;">
+            <p>এই ক্যাটেগরিতে কোনো প্রোডাক্ট যোগ করা হয়নি।</p>
+        </div>
+    {% endif %}
+
+    {% if category.rules_text %}
+    <div class="styled-container">
+        <h3>ব্যবহারবিধি (Usage Rules)</h3>
+        <div class="rules-content" id="rulesContentContainer">
+            {{ category.rules_text | safe }}
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const productOptionsGrid = document.getElementById('productOptions');
+    const paymentOptionsContainer = document.getElementById('paymentOptions');
+    const paymentTotalElement = document.getElementById('paymentTotal');
+    const rulesContentContainer = document.getElementById('rulesContentContainer');
+
+    // --- Function to update payment amount ---
+    function updatePaymentAmount() {
+        const activeProduct = productOptionsGrid ? productOptionsGrid.querySelector('.option-item.active') : null;
+        let price = "0";
+        if (activeProduct) {
+            price = activeProduct.getAttribute('data-price');
+        }
+        paymentTotalElement.textContent = `আপনাকে পেমেন্ট করতে হবে: ${price} টাকা`;
+    }
+
+    // --- Product selection logic ---
+    if (productOptionsGrid) {
+        const productItems = productOptionsGrid.querySelectorAll('.option-item');
+        productItems.forEach(item => {
+          item.addEventListener('click', function() {
+            if (this.classList.contains('out-of-stock')) return;
+            const currentActive = productOptionsGrid.querySelector('.option-item.active');
+            if (currentActive) currentActive.classList.remove('active');
+            this.classList.add('active');
+            this.querySelector('input[type="radio"]').checked = true;
+            updatePaymentAmount();
+          });
+        });
+    }
+
+    // --- Payment method selection logic ---
+    if (paymentOptionsContainer) {
+        const paymentItems = paymentOptionsContainer.querySelectorAll('.payment-option');
+        paymentItems.forEach(item => {
+            item.addEventListener('click', function() {
+                const currentActive = paymentOptionsContainer.querySelector('.payment-option.active');
+                if (currentActive) currentActive.classList.remove('active');
+                this.classList.add('active');
+                this.querySelector('input[type="radio"]').checked = true;
+            });
+        });
+    }
+
+    // --- [NEW] Function to format the rules text ---
+    function formatRules() {
+        if (!rulesContentContainer) return;
+
+        let rawText = rulesContentContainer.innerHTML.trim();
+
+        // 1. Handle color codes like [c=red]text[/c] or [c=#ff0000]text[/c]
+        rawText = rawText.replace(/\[c=([a-zA-Z0-9#]+)\](.*?)\[\/c\]/g, '<span style="color: $1; font-weight: 600;">$2</span>');
+
+        // 2. Handle list items starting with %st
+        const pointIconSVG = `<svg class="rule-item-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>`;
+        const lines = rawText.split('\n');
+        let formattedHTML = '';
+
+        lines.forEach(line => {
+            let trimmedLine = line.trim();
+            if (trimmedLine.startsWith('%st')) {
+                let ruleText = trimmedLine.substring(3).trim(); // Remove '%st' and extra space
+                if(ruleText) {
+                    formattedHTML += `<div class="rule-item">${pointIconSVG}<span>${ruleText}</span></div>`;
+                }
+            } else if (trimmedLine) {
+                // For lines that don't start with %st, show them as normal paragraphs
+                formattedHTML += `<p>${trimmedLine}</p>`; 
+            }
+        });
+
+        rulesContentContainer.innerHTML = formattedHTML;
+    }
+
+    // --- Initial calls on page load ---
+    updatePaymentAmount();
+    formatRules();
+  });
+</script>
+
+{% endblock %}
