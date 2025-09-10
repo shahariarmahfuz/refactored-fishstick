@@ -6,20 +6,27 @@
         justify-content: space-between;
         align-items: center;
         margin-bottom: 20px;
+        flex-wrap: wrap; /* ছোট স্ক্রিনের জন্য wrap করা হয়েছে */
+        gap: 15px;
+    }
+    .page-header h1 {
+        margin: 0;
     }
     .tabs {
         display: flex;
-        gap: 10px;
+        gap: 5px; /* গ্যাপ কমানো হয়েছে */
         background: #e9ecef;
         padding: 5px;
         border-radius: 8px;
+        flex-shrink: 0; /* ছোট স্ক্রিনে সংকুচিত হবে না */
     }
     .tab-link {
-        padding: 8px 20px;
+        padding: 8px 15px; /* প্যাডিং কমানো হয়েছে */
         text-decoration: none;
         color: #495057;
         font-weight: bold;
         border-radius: 6px;
+        white-space: nowrap; /* লেখা ভাঙবে না */
     }
     .tab-link.active {
         background-color: #fff;
@@ -28,14 +35,22 @@
     }
     .order-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+        grid-template-columns: 1fr; /* মোবাইল ডিভাইসে ডিফল্ট এক কলাম */
         gap: 20px;
+    }
+    /* বড় স্ক্রিনের জন্য দুটি কলাম */
+    @media (min-width: 992px) {
+        .order-grid {
+            grid-template-columns: 1fr 1fr;
+        }
     }
     .order-card {
         background: #fff;
         border-radius: 8px;
         box-shadow: 0 2px 8px rgba(0,0,0,0.08);
         overflow: hidden;
+        display: flex;
+        flex-direction: column;
     }
     .order-card-header {
         display: flex;
@@ -47,15 +62,16 @@
     }
     .order-card-header .order-id { font-weight: bold; }
     .order-card-header .order-time { font-size: 0.85em; color: #6c757d; }
-    .order-card-body { padding: 15px; }
+    .order-card-body { padding: 15px; flex-grow: 1; }
     .order-card-body p { margin: 0 0 10px 0; font-size: 0.95em; color: #495057; }
-    .order-card-body strong { color: #212529; min-width: 100px; display: inline-block; }
+    .order-card-body strong { color: #212529; min-width: 90px; display: inline-block; }
     .order-card-footer {
         padding: 10px 15px;
         background: #f8f9fa;
         display: flex;
         justify-content: flex-end;
         gap: 10px;
+        border-top: 1px solid #dee2e6;
     }
 </style>
 
@@ -78,7 +94,6 @@
         <div class="order-card-body">
             <p><strong>User:</strong> {{ order.username }}</p>
             <p><strong>Game:</strong> {{ order.game_title }}</p>
-            <p><strong>Category:</strong> {{ order.category_name }}</p>
             <p><strong>Package:</strong> {{ order.product_name }}</p>
             <p><strong>Player ID:</strong> {{ order.game_uid }}</p>
             <p><strong>Price:</strong> ৳ {{ "%.2f"|format(order.price) }}</p>
