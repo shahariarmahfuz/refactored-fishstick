@@ -1,62 +1,112 @@
 {% extends 'admin_layout.html' %}
 {% block content %}
-    <h1>সকল অর্ডার</h1>
-    <div style="overflow-x: auto;">
-    <table>
-        <thead>
-            <tr>
-                <th>অর্ডার আইডি</th>
-                <th>গেম ও প্রোডাক্ট</th>
-                <th>গেম UID</th>
-                <th>পেমেন্ট তথ্য</th>
-                <th>স্ট্যাটাস</th>
-                <th>সময়</th>
-                <th>অ্যাকশন</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for order in orders %}
-            <tr>
-                <td>{{ order.id }}</td>
-                <td>
-                    <strong>{{ order.game_title }}</strong><br>
-                    {{ order.product_name }} ({{ "%.2f"|format(order.price) }} টাকা)
-                </td>
-                <td>{{ order.game_uid }}</td>
-                <td>
-                    {% if order.payment_method %}
-                        <strong>{{ order.payment_method }}</strong><br>
-                    {% endif %}
-                    {% if order.transaction_id %}
-                        TrxID: {{ order.transaction_id }}<br>
-                    {% endif %}
-                    {% if order.screenshot_url %}
-                        <a href="{{ order.screenshot_url }}" target="_blank">স্ক্রিনশট দেখুন</a>
-                    {% endif %}
-                </td>
-                <td>{{ order.status }}</td>
-                <td>{{ order.order_time | bst_time }}</td>
-                <td class="actions">
-                    {% if order.status == 'Pending Payment' %}
-                    <form action="{{ url_for('admin.update_order', order_id=order.id) }}" method="post" style="display: inline-block; margin-bottom: 5px;">
-                        <input type="hidden" name="status" value="Completed">
-                        <button type="submit">Approve</button>
-                    </form>
-                    {% endif %}
-                    {% if order.status != 'Completed' and order.status != 'Rejected' %}
-                    <form action="{{ url_for('admin.update_order', order_id=order.id) }}" method="post" style="display: inline-block;">
-                        <input type="hidden" name="status" value="Rejected">
-                        <button type="submit" class="btn-danger">Reject</button>
-                    </form>
-                    {% endif %}
-                </td>
-            </tr>
-            {% else %}
-            <tr>
-                <td colspan="7" style="text-align: center;">কোনো অর্ডার পাওয়া যায়নি।</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+<style>
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+    }
+    .tabs {
+        display: flex;
+        gap: 10px;
+        background: #e9ecef;
+        padding: 5px;
+        border-radius: 8px;
+    }
+    .tab-link {
+        padding: 8px 20px;
+        text-decoration: none;
+        color: #495057;
+        font-weight: bold;
+        border-radius: 6px;
+    }
+    .tab-link.active {
+        background-color: #fff;
+        color: #007bff;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+    .order-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+        gap: 20px;
+    }
+    .order-card {
+        background: #fff;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        overflow: hidden;
+    }
+    .order-card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: #f8f9fa;
+        padding: 10px 15px;
+        border-bottom: 1px solid #dee2e6;
+    }
+    .order-card-header .order-id { font-weight: bold; }
+    .order-card-header .order-time { font-size: 0.85em; color: #6c757d; }
+    .order-card-body { padding: 15px; }
+    .order-card-body p { margin: 0 0 10px 0; font-size: 0.95em; color: #495057; }
+    .order-card-body strong { color: #212529; min-width: 100px; display: inline-block; }
+    .order-card-footer {
+        padding: 10px 15px;
+        background: #f8f9fa;
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+    }
+</style>
+
+<div class="page-header">
+    <h1>Manage Orders</h1>
+    <div class="tabs">
+        <a href="{{ url_for('admin.view_orders', status='pending') }}" class="tab-link {% if current_filter == 'pending' %}active{% endif %}">Pending</a>
+        <a href="{{ url_for('admin.view_orders', status='accepted') }}" class="tab-link {% if current_filter == 'accepted' %}active{% endif %}">Accepted</a>
+        <a href="{{ url_for('admin.view_orders', status='rejected') }}" class="tab-link {% if current_filter == 'rejected' %}active{% endif %}">Rejected</a>
     </div>
+</div>
+
+<div class="order-grid">
+    {% for order in orders %}
+    <div class="order-card">
+        <div class="order-card-header">
+            <span class="order-id">Serial NO: {{ order.id }}</span>
+            <span class="order-time">{{ order.order_time | bst_time }}</span>
+        </div>
+        <div class="order-card-body">
+            <p><strong>User:</strong> {{ order.username }}</p>
+            <p><strong>Game:</strong> {{ order.game_title }}</p>
+            <p><strong>Category:</strong> {{ order.category_name }}</p>
+            <p><strong>Package:</strong> {{ order.product_name }}</p>
+            <p><strong>Player ID:</strong> {{ order.game_uid }}</p>
+            <p><strong>Price:</strong> ৳ {{ "%.2f"|format(order.price) }}</p>
+            <p><strong>Payment:</strong> 
+                {{ order.payment_method or 'N/A' }}
+                {% if order.transaction_id %}
+                    (TrxID: {{ order.transaction_id }})
+                {% endif %}
+            </p>
+            {% if order.screenshot_url %}
+            <p><strong>Screenshot:</strong> <a href="{{ order.screenshot_url }}" target="_blank">View Image</a></p>
+            {% endif %}
+        </div>
+        {% if order.status == 'Pending Payment' %}
+        <div class="order-card-footer">
+            <form action="{{ url_for('admin.update_order', order_id=order.id) }}" method="post" style="margin:0;">
+                <input type="hidden" name="status" value="Rejected">
+                <button type="submit" class="btn-danger">Reject</button>
+            </form>
+            <form action="{{ url_for('admin.update_order', order_id=order.id) }}" method="post" style="margin:0;">
+                <input type="hidden" name="status" value="Completed">
+                <button type="submit">Approve</button>
+            </form>
+        </div>
+        {% endif %}
+    </div>
+    {% else %}
+    <p>এই সেকশনে কোনো অর্ডার পাওয়া যায়নি।</p>
+    {% endfor %}
+</div>
 {% endblock %}
