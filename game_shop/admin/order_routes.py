@@ -10,20 +10,38 @@ import psycopg2.extras
 def view_orders():
     db = get_db()
     cursor = db.cursor(cursor_factory=psycopg2.extras.DictCursor)
-    cursor.execute('''
-        SELECT o.id, o.game_uid, o.status, o.order_time, o.payment_method, o.transaction_id, o.screenshot_url,
-               p.name as product_name, p.price, 
-               c.name as category_name, g.title as game_title
+    
+    status_filter = request.args.get('status', 'pending').lower()
+
+    query = '''
+        SELECT o.id, o.game_uid, o.status, o.order_time, o.payment_method, 
+               o.transaction_id, o.screenshot_url, p.name as product_name, 
+               p.price, c.name as category_name, g.title as game_title, u.username
         FROM orders o 
         JOIN product p ON o.product_id = p.id 
         JOIN category c ON p.category_id = c.id 
         JOIN game g ON c.game_id = g.id
-        WHERE o.status IN ('Pending Payment', 'Completed', 'Rejected')
-        ORDER BY o.order_time DESC
-    ''')
+        JOIN users u ON o.account_user_id = u.id
+    '''
+    params = []
+
+    if status_filter == 'pending':
+        query += " WHERE o.status = %s"
+        params.append('Pending Payment')
+    elif status_filter == 'accepted':
+        query += " WHERE o.status = %s"
+        params.append('Completed')
+    elif status_filter == 'rejected':
+        query += " WHERE o.status = %s"
+        params.append('Rejected')
+    
+    query += ' ORDER BY o.order_time DESC'
+    
+    cursor.execute(query, tuple(params))
     orders = cursor.fetchall()
     cursor.close()
-    return render_template('view_orders.html', orders=orders)
+    
+    return render_template('view_orders.html', orders=orders, current_filter=status_filter)
 
 @bp.route('/update_order/<int:order_id>', methods=['POST'])
 @login_required
@@ -31,7 +49,7 @@ def update_order(order_id):
     status = request.form['status']
     db = get_db()
     cursor = db.cursor(cursor_factory=psycopg2.extras.DictCursor)
-
+    
     if status == 'Rejected':
         cursor.execute(
             '''SELECT o.account_user_id, o.payment_method, p.price 
@@ -54,7 +72,7 @@ def update_order(order_id):
                    (status, completion_time, order_id))
     else:
         cursor.execute('UPDATE orders SET status = %s WHERE id = %s', (status, order_id))
-
+    
     db.commit()
     cursor.close()
     return redirect(url_for('admin.view_orders'))
@@ -87,7 +105,7 @@ def update_deposit(deposit_id):
         flash('অনুরোধটি খুঁজে পাওয়া যায়নি।')
         cursor.close()
         return redirect(url_for('admin.wallet_deposits'))
-
+    
     if new_status == 'Approved' and deposit['status'] == 'Pending':
         cursor.execute('UPDATE users SET balance = balance + %s WHERE id = %s', (deposit['amount'], deposit['user_id']))
         cursor.execute('UPDATE wallet_transactions SET status = %s WHERE id = %s', (new_status, deposit_id))
@@ -97,6 +115,6 @@ def update_deposit(deposit_id):
         cursor.execute('UPDATE wallet_transactions SET status = %s WHERE id = %s', (new_status, deposit_id))
         db.commit()
         flash('অনুরোধটি Reject করা হয়েছে।')
-
+    
     cursor.close()
     return redirect(url_for('admin.wallet_deposits'))
