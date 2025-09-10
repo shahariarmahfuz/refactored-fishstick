@@ -1,0 +1,8 @@
+Flask
+pytz
+Flask-WTF
+psycopg2-binary
+MarkupSafe
+Jinja2
+werkzeug
+requests
