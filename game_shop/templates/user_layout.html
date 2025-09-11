@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;700&family=Hind+Siliguri:wght@400;700&display=swap" rel="stylesheet">
 
     <style>
@@ -172,10 +172,6 @@
     </header>
 
     <main class="layout-main">
-        <div class="content-wrapper">
-             <h1>Welcome to X NEKO</h1>
-             <p>This page now has the light-themed footer.</p>
-        </div>
         {% with messages = get_flashed_messages(with_categories=true) %}{% if messages %}{% for category, message in messages %}<div class="flash">{{ message }}</div>{% endfor %}{% endif %}{% endwith %}
         {% block content %}{% endblock %}
     </main>
