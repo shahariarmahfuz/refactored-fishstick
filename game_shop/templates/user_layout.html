@@ -140,6 +140,31 @@
         .bottom-nav a { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 10px 5px; text-decoration: none; color: #6b7280; flex-grow: 1; font-size: 0.75em; }
         .bottom-nav a .fas { font-size: 1.4em; margin-bottom: 4px; }
         .bottom-nav a.active { color: var(--primary-color); }
+
+        /* --- নতুন যুক্ত করা ফ্লোটিং সাপোর্ট বাটন --- */
+        .support-fab {
+            position: fixed;
+            bottom: 85px; /* নিচের নেভিগেশন বারের উপরে রাখার জন্য */
+            right: 20px;
+            width: 55px;
+            height: 55px;
+            background-color: var(--primary-color);
+            color: white;
+            border-radius: 50%; /* গোলাকার করার জন্য */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            text-decoration: none;
+            font-size: 24px; /* আইকনের আকার */
+            z-index: 1001;
+            transition: all 0.2s ease-in-out;
+        }
+
+        .support-fab:hover {
+            background-color: var(--primary-hover);
+            transform: scale(1.05); /* হালকা বড় হবে */
+        }
     </style>
 </head>
 <body>
@@ -187,6 +212,7 @@
             <p class="footer-copyright">&copy; 2025 X NEKO. All rights reserved.</p>
         </div>
     </footer>
+
     {% if g.user %}
     <nav class="bottom-nav">
         <a href="{{ url_for('views.home') }}" class="{% if request.endpoint == 'views.home' %}active{% endif %}"><i class="fas fa-home"></i><span>Home</span></a>
@@ -196,5 +222,9 @@
         <a href="{{ url_for('user_auth.redeem') }}" class="{% if request.endpoint == 'user_auth.redeem' %}active{% endif %}"><i class="fas fa-gift"></i><span>Redeem</span></a>
     </nav>
     {% endif %}
+
+    <a href="https://t.me/xnekotopup" class="support-fab" target="_blank" title="সাপোর্ট">
+        <i class="fas fa-headset"></i>
+    </a>
 </body>
 </html>
