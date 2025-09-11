@@ -8,7 +8,7 @@
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;700&family=Hind+Siliguri:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;700&family=Hind+Siliguri:wght@400;700&display=swap" rel="stylesheet">
 
     <style>
         /* বেগুনি থিমের জন্য ভ্যারিয়েবল */
@@ -18,8 +18,6 @@
             --primary-light: #f5f3ff;
             --text-success: #166534;
             --bg-success: #f0fdf4;
-            --footer-bg: #1f2937;
-            --footer-text: #d1d5db;
         }
 
         body { 
@@ -28,22 +26,22 @@
             background-color: #f8fafc; 
             color: #1f2937;
             padding-top: 70px;
-            padding-bottom: 70px;
+            padding-bottom: 70px; /* নিচের নেভিগেশন বারের জন্য জায়গা */
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
         }
 
-        /* === এখানে পরিবর্তন করা হয়েছে === */
         .layout-main { 
             max-width: 1200px; 
             margin: 20px auto; 
-            padding: 0; /* পরিবর্তন: চাপিয়ে দেওয়া প্যাডিং সরিয়ে দেওয়া হয়েছে */
-            position: relative; 
-            z-index: 1; 
+            padding: 0;
+            flex: 1; /* ফুটারকে নিচে রাখতে সাহায্য করবে */
         }
 
         .content-wrapper {
-            padding: 0 15px; /* পরিবর্তন: এখানে প্যাডিং ফিরিয়ে আনা হয়েছে */
+            padding: 0 15px;
         }
-        /* --------------------------- */
 
         /* উপরের নেভিগেশন বার */
         .top-nav { 
@@ -79,66 +77,50 @@
         .login-btn:hover { background-color: var(--primary-hover); }
         .flash { padding: 1em; margin: 1em 15px; border-radius: 4px; background: #d9edf7; color: #31708f; border: 1px solid #bce8f1; }
 
-        /* ফুটারের স্টাইল */
-        .site-footer {
-            background-color: var(--footer-bg);
-            color: var(--footer-text);
-            padding: 40px 20px 20px;
-            margin-top: 40px;
-            text-align: center;
+        /* --- পরিবর্তিত নতুন ফুটারের স্টাইল শুরু --- */
+        .light-footer {
+            background-color: #f8f9fa; /* হালকা ব্যাকগ্রাউন্ড */
+            padding: 25px 30px;
+            border-top: 1px solid #dee2e6;
+            margin-top: 40px; /* মূল কন্টেন্ট থেকে দূরত্ব */
         }
-        .footer-container {
-            max-width: 600px;
+        .footer-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 18px; /* আইকন এবং টেক্সটের মধ্যে দূরত্ব */
+            max-width: 1100px;
             margin: 0 auto;
         }
-        .footer-logo h3 {
-            font-size: 1.6em;
-            color: #ffffff;
-            font-weight: 700;
-            margin: 0 0 10px 0;
-        }
-        .footer-tagline {
-            font-family: 'Hind Siliguri', sans-serif;
-            font-size: 1em;
-            line-height: 1.7;
-            margin: 0 auto 25px auto;
-            max-width: 450px;
-        }
-        .footer-contact h4 {
-            font-size: 1.1em;
-            color: #ffffff;
-            margin: 0 0 15px 0;
-            font-weight: 700;
-        }
-        .footer-social-links {
+        .footer-social-icons {
             display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 12px;
-            margin-bottom: 30px;
+            gap: 20px;
         }
-        .footer-social-links a {
-            display: inline-flex;
-            justify-content: center;
-            align-items: center;
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background-color: #374151;
-            color: #ffffff;
+        .footer-social-icons a {
+            color: #6c757d;
+            font-size: 20px;
             text-decoration: none;
-            font-size: 1.1em;
-            transition: background-color 0.3s ease, transform 0.2s ease;
+            transition: color 0.3s ease, transform 0.2s ease;
         }
-        .footer-social-links a:hover {
-            background-color: var(--primary-color);
-            transform: translateY(-2px);
+        .footer-social-icons a:hover {
+            color: var(--primary-color); /* থিমের প্রাইমারি রঙ ব্যবহার */
+            transform: scale(1.1);
         }
-        .footer-bottom {
-            padding-top: 15px;
-            border-top: 1px solid #374151;
-            font-size: 0.9em;
+        .footer-copyright {
+            margin: 0;
+            font-size: 14px;
+            font-weight: 500;
+            color: #6c757d;
         }
+        @media (min-width: 768px) {
+            .footer-content {
+                flex-direction: row;
+                justify-content: space-between;
+            }
+            .footer-social-icons { order: 2; }
+            .footer-copyright { order: 1; }
+        }
+        /* --- পরিবর্তিত নতুন ফুটারের স্টাইল শেষ --- */
 
         /* নিচের নেভিগেশন বার */
         .bottom-nav { 
@@ -190,35 +172,25 @@
     </header>
 
     <main class="layout-main">
+        <div class="content-wrapper">
+             <h1>Welcome to X NEKO</h1>
+             <p>This page now has the light-themed footer.</p>
+        </div>
         {% with messages = get_flashed_messages(with_categories=true) %}{% if messages %}{% for category, message in messages %}<div class="flash">{{ message }}</div>{% endfor %}{% endif %}{% endwith %}
         {% block content %}{% endblock %}
     </main>
 
-    <footer class="site-footer">
-        <div class="footer-container">
-            <div class="footer-logo">
-                <h3>X NEKO</h3>
+    <footer class="light-footer">
+        <div class="footer-content">
+            <div class="footer-social-icons">
+                <a href="#" target="_blank" title="ফেসবুক"><i class="fab fa-facebook-f"></i></a>
+                <a href="#" target="_blank" title="ইউটিউব"><i class="fab fa-youtube"></i></a>
+                <a href="#" target="_blank" title="হোয়াটসঅ্যাপ"><i class="fab fa-whatsapp"></i></a>
+                <a href="#" target="_blank" title="টেলিগ্রাম"><i class="fab fa-telegram"></i></a>
             </div>
-            <p class="footer-tagline">
-                আপনার বিশ্বস্ত গেমিং টপ-আপ এবং ডিজিটাল প্রোডাক্টের নির্ভরযোগ্য একটি প্ল্যাটফর্ম। দ্রুত ডেলিভারি ও নিরাপদ পেমেন্টের নিশ্চয়তা।
-            </p>
-            <div class="footer-contact">
-                <h4>যোগাযোগ</h4>
-                <div class="footer-social-links">
-                    <a href="mailto:contact@xneko.com" title="ইমেইল করুন"><i class="fas fa-envelope"></i></a>
-                    <a href="tel:+8801234567890" title="ফোন করুন"><i class="fas fa-phone"></i></a>
-                    <a href="#" target="_blank" title="ফেসবুক"><i class="fab fa-facebook-f"></i></a>
-                    <a href="#" target="_blank" title="ইউটিউব"><i class="fab fa-youtube"></i></a>
-                    <a href="#" target="_blank" title=" হোয়াটসঅ্যাপ"><i class="fab fa-whatsapp"></i></a>
-                    <a href="#" target="_blank" title="টেলিগ্রাম"><i class="fab fa-telegram-plane"></i></a>
-                </div>
-            </div>
-        </div>
-        <div class="footer-bottom">
-            <p>&copy; 2025 X NEKO. All rights reserved.</p>
+            <p class="footer-copyright">&copy; 2025 X NEKO. All rights reserved.</p>
         </div>
     </footer>
-
     {% if g.user %}
     <nav class="bottom-nav">
         <a href="{{ url_for('views.home') }}" class="{% if request.endpoint == 'views.home' %}active{% endif %}"><i class="fas fa-home"></i><span>Home</span></a>
