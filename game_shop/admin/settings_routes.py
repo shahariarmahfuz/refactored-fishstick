@@ -1,8 +1,9 @@
-from flask import render_template, request, flash, redirect, url_for
+from flask import render_template, request, flash, redirect, url_for, g
 from game_shop.auth import login_required
 from game_shop.db import get_db
 from game_shop.admin import bp
 import psycopg2.extras
+from werkzeug.security import check_password_hash, generate_password_hash
 
 @bp.route('/payment-settings', methods=['GET', 'POST'])
 @login_required
@@ -53,3 +54,40 @@ def manage_wallets():
     users = cursor.fetchall()
     cursor.close()
     return render_template('manage_wallets.html', users=users)
+
+@bp.route('/change-password', methods=['GET', 'POST'])
+@login_required
+def change_password():
+    if request.method == 'POST':
+        current_password = request.form['current_password']
+        new_password = request.form['new_password']
+        confirm_password = request.form['confirm_password']
+
+        db = get_db()
+        cursor = db.cursor(cursor_factory=psycopg2.extras.DictCursor)
+        admin_user = g.admin
+        error = None
+
+        if not check_password_hash(admin_user['password'], current_password):
+            error = 'আপনার বর্তমান পাসওয়ার্ডটি সঠিক নয়।'
+        elif new_password != confirm_password:
+            error = 'নতুন পাসওয়ার্ড এবং কনফার্ম পাসওয়ার্ড মিলছে না।'
+        elif len(new_password) < 6:
+            error = 'নতুন পাসওয়ার্ড কমপক্ষে ৬ অক্ষরের হতে হবে।'
+
+        if error:
+            flash(error)
+        else:
+            hashed_password = generate_password_hash(new_password)
+            cursor.execute(
+                'UPDATE admin SET password = %s WHERE id = %s',
+                (hashed_password, admin_user['id'])
+            )
+            db.commit()
+            flash('পাসওয়ার্ড সফলভাবে পরিবর্তন করা হয়েছে।')
+            cursor.close()
+            return redirect(url_for('admin.dashboard'))
+        
+        cursor.close()
+
+    return render_template('change_password.html')
