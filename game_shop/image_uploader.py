@@ -1,6 +1,6 @@
 import requests
 
-API_ENDPOINT = "https://91aadddc-1690-4f1e-abba-d5cb9e415b44-00-2h14hl3o6ghmf.pike.replit.dev/upload"
+API_ENDPOINT = "https://xabi4545.pythonanywhere.com/upload"
 
 def upload_image_to_xenko(file_storage):
     """
